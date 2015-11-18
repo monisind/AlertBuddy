@@ -3,7 +3,7 @@
 /.idea/workspace.xml
 /.idea/libraries
 .DS_Store
-Application/build
+Application/build/
 *.iml
 .idea
 #.idea/workspace.xml
