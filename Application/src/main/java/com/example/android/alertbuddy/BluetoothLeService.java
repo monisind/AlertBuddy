@@ -63,8 +63,15 @@ public class BluetoothLeService extends Service {
     public final static String EXTRA_DATA =
             "com.example.bluetooth.le.EXTRA_DATA";
 
-    public final static UUID UUID_HEART_RATE_MEASUREMENT =
-            UUID.fromString(SampleGattAttributes.HEART_RATE_MEASUREMENT);
+    private BluetoothGattCharacteristic tx;
+    private BluetoothGattCharacteristic rx;
+
+    public final static UUID UUID_HEART_RATE_MEASUREMENT = UUID.fromString(SampleGattAttributes.HEART_RATE_MEASUREMENT);
+    public final static UUID UART_UUID = UUID.fromString(SampleGattAttributes.UART_CHARACTERISTIC);
+    public final static UUID TX_UUID = UUID.fromString(SampleGattAttributes.TX_CHARACTERISTIC);
+    public final static UUID RX_UUID = UUID.fromString(SampleGattAttributes.RX_CHARACTERISTIC);
+    public final static UUID CLIENT_UUID = UUID.fromString(SampleGattAttributes.CLIENT_CHARACTERISTIC_CONFIG);
+
 
     // Implements callback methods for GATT events that the app cares about.  For example,
     // connection change and services discovered.
@@ -89,6 +96,16 @@ public class BluetoothLeService extends Service {
             }
         }
 
+//        @Override
+//        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+//            if (status == BluetoothGatt.GATT_SUCCESS) {
+//                broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
+//            } else {
+//                Log.w(TAG, "onServicesDiscovered received: " + status);
+//            }
+//        }
+
+
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
@@ -96,7 +113,29 @@ public class BluetoothLeService extends Service {
             } else {
                 Log.w(TAG, "onServicesDiscovered received: " + status);
             }
+
+            // Save reference to each characteristic.
+            tx = gatt.getService(UART_UUID).getCharacteristic(TX_UUID);
+            rx = gatt.getService(UART_UUID).getCharacteristic(RX_UUID);
+            // Setup notifications on RX characteristic changes (i.e. data received).
+            // First call setCharacteristicNotification to enable notification.
+            if (!gatt.setCharacteristicNotification(rx, true)) {
+                Log.w(TAG, "Couldn't set notifications for RX characteristic! ");
+            }
+            // Next update the RX characteristic's client descriptor to enable notifications.
+            if (rx.getDescriptor(CLIENT_UUID) != null) {
+                BluetoothGattDescriptor desc = rx.getDescriptor(CLIENT_UUID);
+                desc.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+                if (!gatt.writeDescriptor(desc)) {
+                    Log.w(TAG, "Couldn't write RX client descriptor value! ");
+                }
+            }
+            else {
+                Log.w(TAG, "Couldn't get RX client descriptor! ");
+            }
         }
+
+
 
         @Override
         public void onCharacteristicRead(BluetoothGatt gatt,
@@ -139,6 +178,11 @@ public class BluetoothLeService extends Service {
             final int heartRate = characteristic.getIntValue(format, 1);
             Log.d(TAG, String.format("Received heart rate: %d", heartRate));
             intent.putExtra(EXTRA_DATA, String.valueOf(heartRate));
+        }else if(RX_UUID.equals(characteristic.getUuid())){
+            final byte[] data = characteristic.getValue();
+            if (data != null && data.length > 0) {
+                intent.putExtra(EXTRA_DATA, new String(data));
+            }
         } else {
             // For all other profiles, writes the data formatted in HEX.
             final byte[] data = characteristic.getValue();
@@ -280,6 +324,19 @@ public class BluetoothLeService extends Service {
             return;
         }
         mBluetoothGatt.readCharacteristic(characteristic);
+    }
+
+    /**
+     * Write to a given char
+     * @param characteristic The characteristic to write to
+     */
+    public void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
+        if (mBluetoothAdapter == null || mBluetoothGatt == null) {
+            Log.w(TAG, "BluetoothAdapter not initialized");
+            return;
+        }
+
+        mBluetoothGatt.writeCharacteristic(characteristic);
     }
 
     /**
