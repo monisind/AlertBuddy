@@ -81,12 +81,10 @@ public class DisplaySoundActivity extends Activity {
                     String cmd = tx_msg.getText().toString();
                     Log.d(TAG, "send cmd:" + cmd);
                     if (cmd != null) {
-                        byte b = 0x00;
                         byte[] tmp = cmd.getBytes();
-                        byte[] tx = new byte[tmp.length + 1];
-                        tx[0] = b;
-                        for (int i = 1; i < tmp.length + 1; i++) {
-                            tx[i] = tmp[i - 1];
+                        byte[] tx = new byte[tmp.length];
+                        for (int i = 0; i < tmp.length; i++) {
+                            tx[i] = tmp[i];
                         }
                         target_character.setValue(tx);
 
