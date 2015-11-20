@@ -58,12 +58,12 @@
             android:enabled="true" />
 
         <activity
-            android:name=".MainActivity"
-            android:label="@string/title_activity_main" >
-        </activity>
-        <activity
             android:name=".DisplaySoundActivity"
             android:label="@string/title_activity_display_sound" >
+        </activity>
+        <activity
+            android:name=".SoundSettingsActivity"
+            android:label="@string/title_activity_sound_settings" >
         </activity>
     </application>
 

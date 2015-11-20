@@ -1,6 +1,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.android.alertbuddy.DisplaySoundActivity">
-    <item android:id="@+id/action_settings" android:title="@string/action_settings"
-        android:orderInCategory="100" android:showAsAction="never" />
+
+    <item android:id="@+id/action_settings_sound"
+        android:title="@string/action_settings_sound"
+        android:orderInCategory="100"
+        android:showAsAction="never" />
+    <item android:id="@+id/action_settings_vibration"
+        android:title="@string/action_settings_vibration"
+        android:orderInCategory="100"
+        android:showAsAction="never" />
+    <item android:id="@+id/action_settings_ble"
+        android:title="@string/action_settings_ble"
+        android:orderInCategory="100"
+        android:showAsAction="never" />
 </menu>
+

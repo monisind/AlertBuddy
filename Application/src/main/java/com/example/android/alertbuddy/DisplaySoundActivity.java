@@ -233,11 +233,24 @@ public class DisplaySoundActivity extends Activity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                Log.i(TAG, "Menu item: " + item.getTitle());
+                return true;
+            case R.id.action_settings_sound:
+                Log.i(TAG, "Menu item: " + item.getTitle());
+                final Intent intent = new Intent(this, SoundSettingsActivity.class);
+                startActivity(intent);
+                return true;
+            case R.id.action_settings_vibration:
+                Log.i(TAG, "Menu item: " + item.getTitle());
+                return true;
+            case R.id.action_settings_ble:
+                Log.i(TAG, "Menu item: " + item.getTitle());
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-
-        return super.onOptionsItemSelected(item);
     }
 
     private void updateConnectionState(final int resourceId) {
@@ -264,7 +277,7 @@ public class DisplaySoundActivity extends Activity {
 
 
     private void displayData(String data) {
-        if (data != null) {
+        if (data != null && !data.equals("Incorrect Format")) {
             Log.i(TAG, "************** Data: " + data);
             rx_msg.setText(data);
         }

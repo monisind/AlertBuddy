@@ -36,11 +36,19 @@
     <string name="title_activity_main">MainActivity</string>
 
     <string name="hello_world">Hello world!</string>
+
     <string name="action_settings">Settings</string>
+    <string name="action_settings_sound">Sound Settings</string>
+    <string name="action_settings_vibration">Vibration Pattern</string>
+    <string name="action_settings_ble">BLE</string>
+
     <string name="title_activity_display_sound">DisplaySoundActivity</string>
 
     <string name="send_message">Enter a message</string>
     <string name="response_message"></string>
     <string name="button_send">Send</string>
+    <string name="title_activity_sound_settings">Sound Settings</string>
 
+    <string name="sound_settings_sub_header">Select sounds</string>
+    <string name="menu_save_sound">Save</string>
 </resources>
