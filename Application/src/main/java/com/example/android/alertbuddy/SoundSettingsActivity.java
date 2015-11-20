@@ -1,6 +1,7 @@
 package com.example.android.alertbuddy;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -28,8 +29,6 @@ public class SoundSettingsActivity extends Activity {
 
         //Generate list View from ArrayList
         displayListView();
-
-//        checkButtonClick();
     }
 
     private void displayListView(){
@@ -65,45 +64,24 @@ public class SoundSettingsActivity extends Activity {
         return true;
     }
 
-//    private void checkButtonClick() {
-//
-//
-//        Button myButton = (Button) findViewById(R.id.findSelected);
-//        myButton.setOnClickListener(new View.OnClickListener() {
-//
-//            @Override
-//            public void onClick(View v) {
-//
-//                StringBuffer responseText = new StringBuffer();
-//                responseText.append("The following were selected...\n");
-//
-//                ArrayList<SoundModel> soundList = dataAdapter.soundList;
-//                for (int i = 0; i < soundList.size(); i++) {
-//                    SoundModel sound = soundList.get(i);
-//                    if (sound.isSelected()) {
-//                        responseText.append("\n" + sound.getName());
-//                    }
-//                }
-//                Log.i(TAG, "Selected Sounds: " + responseText.toString());
-//            }
-//        });
-//
-//    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_save_sound:
-                saveSoundSettings();
-                break;
-            case R.id.menu_stop:
-
-                break;
+                String newSoundSettings = saveSoundSettings();
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra("soundSettings", newSoundSettings);
+                setResult(RESULT_OK, resultIntent);
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return true;
     }
 
-    public void saveSoundSettings(){
+    public String saveSoundSettings(){
         StringBuffer responseText = new StringBuffer();
         responseText.append("The following were selected...\n");
 
@@ -115,37 +93,21 @@ public class SoundSettingsActivity extends Activity {
             }
         }
         Log.i(TAG, "Selected Sounds inside options: " + responseText.toString());
-        finish();
+        String newSoundSettings = formatSoundSelection(soundList);
+        return newSoundSettings;
     }
 
-
-
-
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_sound_settings);
-//    }
-//
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.menu_sound_settings, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
+    public String formatSoundSelection(ArrayList<SoundModel> soundList){
+        String soundSelection = "";
+        for(SoundModel sound: soundList){
+            soundSelection += sound.getCode();
+            if(sound.isSelected()){
+                soundSelection += "1";
+            }else{
+                soundSelection += "0";
+            }
+            soundSelection += " ";
+        }
+        return  soundSelection;
+    }
 }
