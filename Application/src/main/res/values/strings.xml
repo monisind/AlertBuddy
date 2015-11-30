@@ -42,7 +42,7 @@
     <string name="action_settings_vibration">Vibration Pattern</string>
     <string name="action_settings_ble">BLE</string>
 
-    <string name="title_activity_display_sound">DisplaySoundActivity</string>
+    <string name="title_activity_display_sound">Main</string>
 
     <string name="send_message">Enter a message</string>
     <string name="response_message"></string>
