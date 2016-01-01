@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 public class SoundSettingsActivity extends Activity {
 
-    private final static String TAG = DeviceControlActivity.class.getSimpleName();
+    private final static String TAG = SoundSettingsActivity.class.getSimpleName();
     private ListView listView;
     private SoundModel[] modelItems;
     private CustomAdapter dataAdapter = null;

@@ -30,7 +30,7 @@ import java.util.UUID;
 
 public class DisplaySoundActivity extends Activity {
 
-    private final static String TAG = DeviceControlActivity.class.getSimpleName();
+    private final static String TAG = DisplaySoundActivity.class.getSimpleName();
     static final int REQUEST_CODE = 0;
 
     public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
