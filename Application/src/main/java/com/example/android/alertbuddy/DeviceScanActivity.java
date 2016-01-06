@@ -178,8 +178,8 @@ public class DeviceScanActivity extends ListActivity {
             }, SCAN_PERIOD);
 
             mScanning = true;
-           // mBluetoothAdapter.startLeScan(mLeScanCallback);
-            mBluetoothAdapter.startLeScan(filterUUID, mLeScanCallback);
+            mBluetoothAdapter.startLeScan(mLeScanCallback);
+           // mBluetoothAdapter.startLeScan(filterUUID, mLeScanCallback);
         } else {
             mScanning = false;
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
