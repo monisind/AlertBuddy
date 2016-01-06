@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
  Copyright 2013 The Android Open Source Project
 
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +16,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.android.alertbuddy"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="1.0">
 
     <!-- Min/target SDK versions (<uses-sdk>) managed by build.gradle -->
 
@@ -39,12 +38,12 @@
     <application
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/MyTheme" >
+        android:theme="@style/MyTheme">
 
         <!-- android:theme="@android:style/Theme.Holo.Light"> -->
         <activity
             android:name=".DeviceScanActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -59,12 +58,15 @@
 
         <activity
             android:name=".DisplaySoundActivity"
-            android:label="@string/title_activity_display_sound" >
-        </activity>
+            android:label="@string/title_activity_display_sound" />
         <activity
             android:name=".SoundSettingsActivity"
-            android:label="@string/title_activity_sound_settings" >
-        </activity>
+            android:label="@string/title_activity_sound_settings" />
+
+        <service
+            android:name=".DetectionService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>
