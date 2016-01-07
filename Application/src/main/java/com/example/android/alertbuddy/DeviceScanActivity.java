@@ -50,12 +50,13 @@ public class DeviceScanActivity extends ListActivity {
 
     private static final int REQUEST_ENABLE_BT = 1;
     // Stops scanning after 10 seconds.
-    private static final long SCAN_PERIOD = 10000;
+    private static final long SCAN_PERIOD = 20000;
 
     public final static UUID TX_UUID = UUID.fromString(SampleGattAttributes.TX_CHARACTERISTIC);
     public final static UUID RX_UUID = UUID.fromString(SampleGattAttributes.RX_CHARACTERISTIC);
 
-    private UUID[] filterUUID = {TX_UUID, RX_UUID};
+    private String filterDeviceName = "BLE UART";
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -262,8 +263,15 @@ public class DeviceScanActivity extends ListActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mLeDeviceListAdapter.addDevice(device);
-                    mLeDeviceListAdapter.notifyDataSetChanged();
+                    // Check for saved MAC address
+                        // if device.getAddress() matches saved one, then skip to connecting and displaying controls screen
+
+                    // Filter by device name: "BLE UART"
+                    String scannedDeviceName  = device.getName();
+                    if(scannedDeviceName!=null && scannedDeviceName.equals(filterDeviceName)){
+                        mLeDeviceListAdapter.addDevice(device);
+                        mLeDeviceListAdapter.notifyDataSetChanged();
+                    }
                 }
             });
         }
