@@ -172,6 +172,7 @@ public class DeviceScanActivity extends ListActivity {
         }
         storeDevice(device);
         startActivity(intent);
+        finish();
     }
 
     private void scanLeDevice(final boolean enable) {
