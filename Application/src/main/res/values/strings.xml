@@ -51,4 +51,7 @@
 
     <string name="sound_settings_sub_header">Select sounds</string>
     <string name="menu_save_sound">Save</string>
+
+    <string name="device_name">BLE UART</string>
+    <string name="last_connected_device">Last Connected Device</string>
 </resources>

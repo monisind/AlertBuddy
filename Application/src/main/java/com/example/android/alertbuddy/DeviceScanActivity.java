@@ -23,9 +23,11 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -43,6 +45,7 @@ import java.util.UUID;
  * Activity for scanning and displaying available Bluetooth LE devices.
  */
 public class DeviceScanActivity extends ListActivity {
+    private final static String TAG = DeviceScanActivity.class.getSimpleName();
     private LeDeviceListAdapter mLeDeviceListAdapter;
     private BluetoothAdapter mBluetoothAdapter;
     private boolean mScanning;
@@ -155,7 +158,11 @@ public class DeviceScanActivity extends ListActivity {
     protected void onListItemClick(ListView l, View v, int position, long id) {
         final BluetoothDevice device = mLeDeviceListAdapter.getDevice(position);
         if (device == null) return;
-//        final Intent intent = new Intent(this, DeviceControlActivity.class);
+            selectDevice(device);
+
+    }
+
+    private void selectDevice(BluetoothDevice device){
         final Intent intent = new Intent(this, DisplaySoundActivity.class);
         intent.putExtra(DisplaySoundActivity.EXTRAS_DEVICE_NAME, device.getName());
         intent.putExtra(DisplaySoundActivity.EXTRAS_DEVICE_ADDRESS, device.getAddress());
@@ -163,6 +170,7 @@ public class DeviceScanActivity extends ListActivity {
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
             mScanning = false;
         }
+        storeDevice(device);
         startActivity(intent);
     }
 
@@ -180,7 +188,6 @@ public class DeviceScanActivity extends ListActivity {
 
             mScanning = true;
             mBluetoothAdapter.startLeScan(mLeScanCallback);
-           // mBluetoothAdapter.startLeScan(filterUUID, mLeScanCallback);
         } else {
             mScanning = false;
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
@@ -264,13 +271,18 @@ public class DeviceScanActivity extends ListActivity {
                 @Override
                 public void run() {
                     // Check for saved MAC address
-                        // if device.getAddress() matches saved one, then skip to connecting and displaying controls screen
+                    if(device.getAddress().equals(readStoredDevice())){
+                        //stop scan and autoconnect to device
+                        selectDevice(device);
 
-                    // Filter by device name: "BLE UART"
-                    String scannedDeviceName  = device.getName();
-                    if(scannedDeviceName!=null && scannedDeviceName.equals(filterDeviceName)){
-                        mLeDeviceListAdapter.addDevice(device);
-                        mLeDeviceListAdapter.notifyDataSetChanged();
+                    }else{
+                        //show a list of device
+                        // Filter by device name: "BLE UART"
+                        String scannedDeviceName  = device.getName();
+                        if(scannedDeviceName!=null && scannedDeviceName.equals(filterDeviceName)){
+                            mLeDeviceListAdapter.addDevice(device);
+                            mLeDeviceListAdapter.notifyDataSetChanged();
+                        }
                     }
                 }
             });
@@ -280,5 +292,18 @@ public class DeviceScanActivity extends ListActivity {
     static class ViewHolder {
         TextView deviceName;
         TextView deviceAddress;
+    }
+
+    public void storeDevice(BluetoothDevice device){
+        SharedPreferences sharedPref = DeviceScanActivity.this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(getString(R.string.last_connected_device), device.getAddress());
+        editor.commit();
+    }
+
+    public String readStoredDevice(){
+        SharedPreferences sharedPref = DeviceScanActivity.this.getPreferences(Context.MODE_PRIVATE);
+        String deviceAddress = sharedPref.getString(getString(R.string.last_connected_device), "null");
+        return deviceAddress;
     }
 }
