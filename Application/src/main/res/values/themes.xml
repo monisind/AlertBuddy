@@ -4,6 +4,44 @@
     <style name="MyTheme" parent="android:Theme.Material.Light.DarkActionBar">
         <item name="android:colorAccent">@color/accent</item>
     </style>
+
+    <style name="progress" parent="android:Theme.Dialog">
+        <item name="android:windowBackground">@color/transparent</item>
+        <item name="android:textColorPrimary">@color/red</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textAlignment">gravity</item>
+    </style>
+
+    <!--<style name="progress" parent="android:Theme.Holo.Dialog">-->
+        <!--<item name="android:alertDialogStyle">@style/CustomAlertDialogStyle</item>-->
+        <!--<item name="android:windowBackground">@color/transparent</item>-->
+        <!--<item name="android:textColorPrimary">@color/red</item>-->
+        <!--<item name="android:backgroundDimEnabled">false</item>-->
+        <!--<item name="android:textColor">@color/accent</item>-->
+        <!--<item name="android:textStyle">normal</item>-->
+        <!--<item name="android:textSize">20sp</item>-->
+        <!--<item name="android:textAlignment">viewStart</item>-->
+
+    <!--</style>-->
+
+    <!--<style name="CustomAlertDialogStyle">-->
+        <!--<item name="android:bottomBright">@color/transparent</item>-->
+        <!--<item name="android:bottomDark">@color/transparent</item>-->
+        <!--<item name="android:bottomMedium">@color/transparent</item>-->
+        <!--<item name="android:centerBright">@color/transparent</item>-->
+        <!--<item name="android:centerDark">@color/transparent</item>-->
+        <!--<item name="android:centerMedium">@color/transparent</item>-->
+        <!--<item name="android:fullBright">@color/transparent</item>-->
+        <!--<item name="android:fullDark">@color/transparent</item>-->
+        <!--<item name="android:topBright">@color/transparent</item>-->
+        <!--<item name="android:topDark">@color/transparent</item>-->
+        <!--<item name="android:colorAccent">@color/accent</item>-->
+
+    <!--</style>-->
+
 </resources>
 
 

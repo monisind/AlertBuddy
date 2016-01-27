@@ -6,5 +6,8 @@
     <color name="accent">#FFCC0000</color>
     <color name="windowBackground">#FFFFFF</color>
     <color name="textColorPrimary">#020202</color>
+    <color name="transparent">#00000000</color>
+    <color name="red">#FFCC0000</color>
+    <color name="white">#FFFFFF</color>
 
 </resources>
