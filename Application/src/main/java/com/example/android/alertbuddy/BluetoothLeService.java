@@ -63,6 +63,13 @@ public class BluetoothLeService extends Service {
     public final static String EXTRA_DATA =
             "com.example.bluetooth.le.EXTRA_DATA";
 
+    public final static  String CMD_AVAILABLE =
+            "com.example.bluetooth.le.ACTION_CMD_AVAILABLE";
+
+    public final static  String AUDIO1_CHUNK_AVAILABLE =
+            "com.example.bluetooth.le.ACTION_AUDIO1_AVAILABLE";
+
+
     private BluetoothGattCharacteristic tx;
     private BluetoothGattCharacteristic rx;
 
@@ -70,6 +77,14 @@ public class BluetoothLeService extends Service {
     public final static UUID TX_UUID = UUID.fromString(SampleGattAttributes.TX_CHARACTERISTIC);
     public final static UUID RX_UUID = UUID.fromString(SampleGattAttributes.RX_CHARACTERISTIC);
     public final static UUID CLIENT_UUID = UUID.fromString(SampleGattAttributes.CLIENT_CHARACTERISTIC_CONFIG);
+
+
+    private BluetoothGattCharacteristic cmd;
+    private BluetoothGattCharacteristic audio1;
+
+    public final static UUID CMD_UUID = UUID.fromString(SampleGattAttributes.CMD_CHARACTERISTIC);
+    public final static UUID AUDIO1_UUID = UUID.fromString(SampleGattAttributes.AUDIO1_CHARACTERISTIC);
+    public final static UUID ALERT_BUDDY_UUID = UUID.fromString(SampleGattAttributes.ALERT_BUDDY_SERVICE);
 
 
     // Implements callback methods for GATT events that the app cares about.  For example,
@@ -113,6 +128,47 @@ public class BluetoothLeService extends Service {
                 Log.w(TAG, "onServicesDiscovered received: " + status);
             }
 
+
+            cmd = gatt.getService(ALERT_BUDDY_UUID).getCharacteristic(CMD_UUID);
+            audio1 = gatt.getService(ALERT_BUDDY_UUID).getCharacteristic(AUDIO1_UUID);
+
+            // Enable notifications for CMD characteristic
+            if(!gatt.setCharacteristicNotification(cmd, true))
+            {
+                Log.w(TAG, "Couldn't set notifications for CMD characteristic! ");
+            }
+            // Update the CMD characteristic's client descriptor to enable notifications.
+            if (cmd.getDescriptor(CLIENT_UUID) != null) {
+                BluetoothGattDescriptor desc = cmd.getDescriptor(CLIENT_UUID);
+                desc.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+                if (!gatt.writeDescriptor(desc)) {
+                    Log.w(TAG, "Couldn't write RX client descriptor value! ");
+                }
+            }
+            else {
+                Log.w(TAG, "Couldn't get CMD client descriptor! ");
+            }
+
+
+            // Enable notifications for AUDIO1 characteristic
+            if(!gatt.setCharacteristicNotification(audio1, true))
+            {
+                Log.w(TAG, "Couldn't set notifications for AUDIO1 characteristic! ");
+            }
+            // Update the AUDIO1 characteristic's client descriptor to enable notifications.
+            if (audio1.getDescriptor(CLIENT_UUID) != null) {
+                BluetoothGattDescriptor desc = audio1.getDescriptor(CLIENT_UUID);
+                desc.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+                if (!gatt.writeDescriptor(desc)) {
+                    Log.w(TAG, "Couldn't write RX client descriptor value! ");
+                }
+            }
+            else {
+                Log.w(TAG, "Couldn't get RX client descriptor! ");
+            }
+
+
+
             // Save reference to each characteristic.
             tx = gatt.getService(UART_UUID).getCharacteristic(TX_UUID);
             rx = gatt.getService(UART_UUID).getCharacteristic(RX_UUID);
@@ -132,6 +188,7 @@ public class BluetoothLeService extends Service {
             else {
                 Log.w(TAG, "Couldn't get RX client descriptor! ");
             }
+
         }
 
 
@@ -161,14 +218,22 @@ public class BluetoothLeService extends Service {
                                  final BluetoothGattCharacteristic characteristic) {
         final Intent intent = new Intent(action);
 
-        if(RX_UUID.equals(characteristic.getUuid())){
-            final byte[] data = characteristic.getValue();
+        UUID uuid = characteristic.getUuid();
+        final byte[] data = characteristic.getValue();
+
+       if(uuid.equals(CMD_UUID)) {
+           if (data != null && data.length > 0) {
+               intent.putExtra(CMD_AVAILABLE, data);
+           }
+       } else if(uuid.equals(AUDIO1_UUID)) {
+           if (data != null && data.length > 0) {
+               intent.putExtra(AUDIO1_CHUNK_AVAILABLE, data);
+           }
+       }else if(uuid.equals(RX_UUID)){
             if (data != null && data.length > 0) {
                 intent.putExtra(EXTRA_DATA, new String(data));
             }
         } else {
-            //************check to see if "else if" needed instead of else
-            final byte[] data = characteristic.getValue();
             if (data != null && data.length > 0) {
                 final StringBuilder stringBuilder = new StringBuilder(data.length);
                 for(byte byteChar : data)

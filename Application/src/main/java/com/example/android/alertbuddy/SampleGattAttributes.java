@@ -32,16 +32,28 @@ public class SampleGattAttributes {
     public static String RX_CHARACTERISTIC  = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E";
 
 
+    public static String ALERT_BUDDY_SERVICE = "";
+    public static String CMD_CHARACTERISTIC = "";
+    public static String AUDIO1_CHARACTERISTIC = "";
+
+
+
     private static HashMap<String, String> mServices = new HashMap<String, String>();
     private static HashMap<String, String> mCharacteristics = new HashMap<String, String>();
 
     static {
+
+
         // Sample Services
         attributes.put("0000180d-0000-1000-8000-00805f9b34fb", "Heart Rate Service");
         attributes.put("0000180a-0000-1000-8000-00805f9b34fb", "Device Information Service");
         // Sample Characteristics.
         attributes.put("00002a29-0000-1000-8000-00805f9b34fb", "Manufacturer Name String");
 
+
+        mServices.put(ALERT_BUDDY_SERVICE, "Alert Buddy Service");
+        mCharacteristics.put(CMD_CHARACTERISTIC, "Alert Buddy Cmd");
+        mCharacteristics.put(AUDIO1_CHARACTERISTIC, "Alert Buddy Audio1");
 
         // list of services found on the web
         mServices.put("00001811-0000-1000-8000-00805f9b34fb", "Alert Notification Service");
