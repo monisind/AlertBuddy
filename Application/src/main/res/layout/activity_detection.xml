@@ -13,9 +13,54 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Large Text"
-        android:id="@+id/txtViewDetectedSound"
-        android:layout_marginTop="182dp"
+        android:text="Scanning ....."
+        android:id="@+id/textViewScanning"
+        android:layout_marginTop="34dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Scan"
+        android:id="@+id/buttonScan"
+        android:layout_below="@+id/textViewScanning"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New Text"
+        android:id="@+id/textViewRawData"
+        android:layout_marginStart="31dp"
+        android:layout_below="@+id/textView2"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Raw Data"
+        android:id="@+id/textView2"
+        android:layout_below="@+id/buttonScan"
+        android:layout_alignStart="@+id/textViewRawData" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Detection Result: "
+        android:id="@+id/textView3"
+        android:layout_marginBottom="92dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignStart="@+id/textViewRawData" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="NONE"
+        android:id="@+id/textViewResult"
+        android:layout_alignBottom="@+id/textView3"
+        android:layout_alignEnd="@+id/textViewScanning" />
 </RelativeLayout>

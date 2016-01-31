@@ -1,192 +1,151 @@
+/*
+ * Copyright (C) 2013 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.example.android.alertbuddy;
 
-import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattService;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
+import android.app.Activity;
+import android.app.ListActivity;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothManager;
+import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanFilter;
+import android.bluetooth.le.ScanResult;
+import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.app.Activity;
-import android.os.IBinder;
-import android.util.Log;
+import android.os.Handler;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Activity for scanning and displaying available Bluetooth LE devices.
+ */
 public class DetectionActivity extends Activity {
 
-    private final static String TAG = DetectionActivity.class.getSimpleName();
+    private BluetoothAdapter mBluetoothAdapter;
+    private BluetoothLeScanner mBluetoothScanner;
+    private BluetoothDevice mBLeDevice;
+    private boolean mScanning;
+    private Handler mHandler;
 
-    DetectionService mDetectionService;
-    boolean mBound = false;
+    private static final int REQUEST_ENABLE_BT = 1;
+    // Stops scanning after 10 seconds.
+    private static final long SCAN_PERIOD = 10000;
 
-    public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
-    public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
+    private static final String DEVICE_NAME = "AlertBuddy";
 
-    public final static UUID UART_UUID = UUID.fromString(SampleGattAttributes.UART_CHARACTERISTIC);
     public final static UUID TX_UUID = UUID.fromString(SampleGattAttributes.TX_CHARACTERISTIC);
     public final static UUID RX_UUID = UUID.fromString(SampleGattAttributes.RX_CHARACTERISTIC);
 
-    private String mDeviceName;
-    private String mDeviceAddress;
+    private static List<ScanFilter> scanFilters = new ArrayList<ScanFilter>();
+    private static final ScanSettings mScanSettings = new ScanSettings.Builder().build();
 
-    private BluetoothLeService mBluetoothLeService;
-    private ArrayList<ArrayList<BluetoothGattCharacteristic>> mGattCharacteristics = new ArrayList<ArrayList<BluetoothGattCharacteristic>>();
-    private List<BluetoothGattService> services;
-    private boolean mConnected = false;
-    private BluetoothGattCharacteristic mNotifyCharacteristic;
-    private BluetoothGattCharacteristic target_character = null;
+    private TextView mtxtViewRawData = (TextView) findViewById(R.id.textViewRawData);
+    private TextView mtxtViewScanning = (TextView) findViewById(R.id.textViewScanning);
+    private TextView mtxtViewResult = (TextView) findViewById(R.id.textViewResult);
+    private Button mbtnScan = (Button) findViewById(R.id.buttonScan);
 
-    private final String LIST_NAME = "NAME";
-    private final String LIST_UUID = "UUID";
-
-
-    private TextView textView;
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detection);
+        mHandler = new Handler();
 
-        textView = (TextView) findViewById(R.id.txtViewDetectedSound);
-    }
+        // Use this check to determine whether BLE is supported on the device.  Then you can
+        // selectively disable BLE-related features.
+        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+            Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
+            finish();
+        }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        // Bind to LocalService
-        Intent intent1 = new Intent(this, DetectionService.class);
-        bindService(intent1, detectionServiceConnection, Context.BIND_AUTO_CREATE);
+        //No device is detected initially
+        mBLeDevice = null;
 
-        final Intent intent2 = getIntent();
-        mDeviceName = intent2.getStringExtra(EXTRAS_DEVICE_NAME);
-        mDeviceAddress = intent2.getStringExtra(EXTRAS_DEVICE_ADDRESS);
+        // Initializes a Bluetooth adapter.  For API level 21 and above, get a reference to
+        // BluetoothAdapter through BluetoothManager.
+        final BluetoothManager bluetoothManager =
+                (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        mBluetoothAdapter = bluetoothManager.getAdapter();
+        mBluetoothScanner = mBluetoothAdapter.getBluetoothLeScanner();
 
-        Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
-        bindService(gattServiceIntent, bleServiceConnection, BIND_AUTO_CREATE);
+        ScanFilter mScanFilter = new ScanFilter.Builder().setDeviceName(DEVICE_NAME).build();
+        scanFilters.add(mScanFilter);
 
+        // Checks if Bluetooth is supported on the device.
+        if (mBluetoothAdapter == null) {
+            Toast.makeText(this, R.string.error_bluetooth_not_supported, Toast.LENGTH_SHORT).show();
+            finish();
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
-        if (mBluetoothLeService != null) {
-            final boolean result = mBluetoothLeService.connect(mDeviceAddress);
-            Log.d(TAG, "Connect request result=" + result);
+
+        // Ensures Bluetooth is enabled on the device.  If Bluetooth is not currently enabled,
+        // fire an intent to display a dialog asking the user to grant permission to enable it.
+        if (!mBluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        unbindService(detectionServiceConnection);
-        mBluetoothLeService = null;
-
-        unbindService(bleServiceConnection);
-        mDetectionService = null;
-
+    protected void onPause() {
+        super.onPause();
     }
 
-    /** Defines callbacks for service binding, passed to bindService() */
-    private ServiceConnection detectionServiceConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-           DetectionService.DetectionServiceLocalBinder binder = (DetectionService.DetectionServiceLocalBinder) service;
-            mDetectionService = binder.getService();
-            mBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mBound = false;
-        }
-    };
-
-    // Code to manage Service lifecycle.
-    private final ServiceConnection bleServiceConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder service) {
-            mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
-            if (!mBluetoothLeService.initialize()) {
-                Log.e(TAG, "Unable to initialize Bluetooth");
-                finish();
-            }
-            // Automatically connects to the device upon successful start-up initialization.
-            mBluetoothLeService.connect(mDeviceAddress);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            mBluetoothLeService = null;
-        }
-    };
-
-
-    private void updateConnectionState(final int resourceId) {
-        runOnUiThread(new Runnable() {
+    private void scanLeDevice() {
+        mScanning = true;
+        // Stops scanning after a pre-defined scan period.
+        mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                //mConnectionState.setText(resourceId);
-                Log.d(TAG, "**** set connection state");
+                mScanning = false;
+                mBluetoothScanner.stopScan(mBLeScanCallback);
             }
-        });
+        }, SCAN_PERIOD);
+
+        mBluetoothScanner.startScan(scanFilters, mScanSettings, mBLeScanCallback);
     }
 
-    // Handles various events fired by the Service.
-    // ACTION_GATT_CONNECTED: connected to a GATT server.
-    // ACTION_GATT_DISCONNECTED: disconnected from a GATT server.
-    // ACTION_GATT_SERVICES_DISCOVERED: discovered GATT services.
-    // ACTION_DATA_AVAILABLE: received data from the device.  This can be a result of read
-    //                        or notification operations.
-    private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
-            if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
-                mConnected = true;
-                updateConnectionState(R.string.connected);
-                invalidateOptionsMenu();
-            } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
-                mConnected = false;
-                updateConnectionState(R.string.disconnected);
-                invalidateOptionsMenu();
-
-            } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                // Show all the supported services and characteristics on the user interface.
-                // ** changed //
-                services = mBluetoothLeService.getSupportedGattServices();
-                //getCharacteristics(services);
-            } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
-                // ** changed //
-                Log.d(TAG, "&&&&&&&&&&&&&&&&&&&&&  receive data");
-                String value = intent.getStringExtra(BluetoothLeService.EXTRA_DATA);
-                // byte[] value = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
-                if(value != null){
-                   // displayData(value);
-                }else{
-                    Log.d(TAG, "value = null");
-                }
+    private ScanCallback mBLeScanCallback = new ScanCallback() {
+        public void onScanResult(int callbackType, final ScanResult result) {
+            BluetoothDevice d = result.getDevice();
+            //Only interested in the device with the same name
+            if(mBLeDevice == null && d.getName().equals(DEVICE_NAME))
+            {
+                mBLeDevice = d;
+                mBluetoothScanner.stopScan(mBLeScanCallback);
             }
         }
     };
-
-    private static IntentFilter makeGattUpdateIntentFilter() {
-        final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
-        intentFilter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
-        intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
-        intentFilter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
-        return intentFilter;
-    }
-
 }
