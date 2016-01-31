@@ -35,7 +35,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.android.alertbuddy"
-        minSdkVersion 18
+        minSdkVersion 21
         targetSdkVersion 23
     }
 

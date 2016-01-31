@@ -21,6 +21,11 @@ import android.app.ListActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
+import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanFilter;
+import android.bluetooth.le.ScanResult;
+import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -37,6 +42,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -45,6 +51,7 @@ import java.util.UUID;
 public class DeviceScanActivity extends ListActivity {
     private LeDeviceListAdapter mLeDeviceListAdapter;
     private BluetoothAdapter mBluetoothAdapter;
+    private BluetoothLeScanner mBluetoothScanner;
     private boolean mScanning;
     private Handler mHandler;
 
@@ -55,7 +62,8 @@ public class DeviceScanActivity extends ListActivity {
     public final static UUID TX_UUID = UUID.fromString(SampleGattAttributes.TX_CHARACTERISTIC);
     public final static UUID RX_UUID = UUID.fromString(SampleGattAttributes.RX_CHARACTERISTIC);
 
-    private UUID[] filterUUID = {TX_UUID, RX_UUID};
+    private static List<ScanFilter> scanFilters = new ArrayList<ScanFilter>();
+    private static final ScanSettings mScanSettings = new ScanSettings.Builder().build();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -75,6 +83,10 @@ public class DeviceScanActivity extends ListActivity {
         final BluetoothManager bluetoothManager =
                 (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = bluetoothManager.getAdapter();
+        mBluetoothScanner = mBluetoothAdapter.getBluetoothLeScanner();
+
+         ScanFilter mScanFilter = new ScanFilter.Builder().setDeviceName("AlertBuddy").build();
+        scanFilters.add(mScanFilter);
 
         // Checks if Bluetooth is supported on the device.
         if (mBluetoothAdapter == null) {
@@ -159,7 +171,7 @@ public class DeviceScanActivity extends ListActivity {
         intent.putExtra(DisplaySoundActivity.EXTRAS_DEVICE_NAME, device.getName());
         intent.putExtra(DisplaySoundActivity.EXTRAS_DEVICE_ADDRESS, device.getAddress());
         if (mScanning) {
-            mBluetoothAdapter.stopLeScan(mLeScanCallback);
+            mBluetoothScanner.stopScan(mBLeScanCallback);
             mScanning = false;
         }
         startActivity(intent);
@@ -172,17 +184,16 @@ public class DeviceScanActivity extends ListActivity {
                 @Override
                 public void run() {
                     mScanning = false;
-                    mBluetoothAdapter.stopLeScan(mLeScanCallback);
+                    mBluetoothScanner.stopScan(mBLeScanCallback);
                     invalidateOptionsMenu();
                 }
             }, SCAN_PERIOD);
 
             mScanning = true;
-           // mBluetoothAdapter.startLeScan(mLeScanCallback);
-            mBluetoothAdapter.startLeScan(filterUUID, mLeScanCallback);
+            mBluetoothScanner.startScan(scanFilters, mScanSettings, mBLeScanCallback);
         } else {
             mScanning = false;
-            mBluetoothAdapter.stopLeScan(mLeScanCallback);
+            mBluetoothScanner.stopScan(mBLeScanCallback);
         }
         invalidateOptionsMenu();
     }
@@ -253,16 +264,13 @@ public class DeviceScanActivity extends ListActivity {
         }
     }
 
-    // Device scan callback.
-    private BluetoothAdapter.LeScanCallback mLeScanCallback =
-            new BluetoothAdapter.LeScanCallback() {
-
-        @Override
-        public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
+    private ScanCallback mBLeScanCallback = new ScanCallback() {
+        public void onScanResult(int callbackType, final ScanResult result) {
+            //super.onScanResult(callbackType, result);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mLeDeviceListAdapter.addDevice(device);
+                    mLeDeviceListAdapter.addDevice(result.getDevice());
                     mLeDeviceListAdapter.notifyDataSetChanged();
                 }
             });

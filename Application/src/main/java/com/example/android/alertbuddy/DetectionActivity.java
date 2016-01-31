@@ -176,11 +176,6 @@ public class DetectionActivity extends Activity {
                 }else{
                     Log.d(TAG, "value = null");
                 }
-            }else if(BluetoothLeService.CMD_AVAILABLE.equals(action)){
-
-            }else if(BluetoothLeService.AUDIO1_CHUNK_AVAILABLE.equals(action))
-            {
-
             }
         }
     };
