@@ -9,6 +9,8 @@ import java.util.Random;
 
 public class DetectionService extends Service {
 
+    public static int MFCC_SIZE = 13*124;
+
     public DetectionService() {
 
     }
@@ -18,7 +20,7 @@ public class DetectionService extends Service {
     }
 
     public native String helloworld();
-    public native int classify(float audioData, float fs);
+    public native int classify(float[] audioData);
 
     // Binder given to clients
     private final IBinder mBinder = new DetectionServiceLocalBinder();
