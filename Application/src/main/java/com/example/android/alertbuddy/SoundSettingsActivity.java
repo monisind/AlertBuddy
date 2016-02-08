@@ -48,10 +48,8 @@ public class SoundSettingsActivity extends Activity {
                 SoundModel model = (SoundModel) parent.getItemAtPosition(position);
             }
         });
-
-
-
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -65,50 +63,14 @@ public class SoundSettingsActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_save_sound:
-                String newSoundSettings = saveSoundSettings();
-                Intent resultIntent = new Intent();
-                resultIntent.putExtra("soundSettings", newSoundSettings);
-                setResult(RESULT_OK, resultIntent);
+                ArrayList<SoundModel> soundList = dataAdapter.soundList;
+                //save sound settings in local database
+                storeSoundSettings(soundList);
                 finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    public String saveSoundSettings(){
-        StringBuffer responseText = new StringBuffer();
-        responseText.append("The following were selected...\n");
-
-        ArrayList<SoundModel> soundList = dataAdapter.soundList;
-
-        //save sound settings in local database
-        storeSoundSettings(soundList);
-
-
-        for (int i = 0; i < soundList.size(); i++) {
-            SoundModel sound = soundList.get(i);
-            if (sound.isSelected()) {
-                responseText.append("\n" + sound.getName());
-            }
-        }
-        Log.i(TAG, "Selected Sounds inside options: " + responseText.toString());
-        String newSoundSettings = formatSoundSelection(soundList);
-        return newSoundSettings;
-    }
-
-    public String formatSoundSelection(ArrayList<SoundModel> soundList){
-        String soundSelection = "";
-        for(SoundModel sound: soundList){
-            soundSelection += sound.getCode();
-            if(sound.isSelected()){
-                soundSelection += "1";
-            }else{
-                soundSelection += "0";
-            }
-            soundSelection += " ";
-        }
-        return  soundSelection;
     }
 
     public void storeSoundSettings(ArrayList<SoundModel> soundList){
@@ -128,18 +90,18 @@ public class SoundSettingsActivity extends Activity {
         ArrayList<SoundModel> soundList = new ArrayList<SoundModel>();
 
         for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
-            SoundModel model = new SoundModel("1",entry.getKey(), (Boolean)entry.getValue());
+            SoundModel model = new SoundModel(entry.getKey(), (Boolean)entry.getValue());
             soundList.add(model);
         }
 
         if(soundList.size() == 0){
-            SoundModel model = new SoundModel("1","Ambulance",false);
+            SoundModel model = new SoundModel("Ambulance",false);
             soundList.add(model);
-            model = new SoundModel("2","Fire Alarm", false);
+            model = new SoundModel("Fire Alarm", false);
             soundList.add(model);
-            model = new SoundModel("3","Police", false);
+            model = new SoundModel("Police", false);
             soundList.add(model);
-            model = new SoundModel("4","car horn", false);
+            model = new SoundModel("car horn", false);
             soundList.add(model);
         }
 
