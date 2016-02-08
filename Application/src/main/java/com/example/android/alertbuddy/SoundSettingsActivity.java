@@ -1,7 +1,10 @@
 package com.example.android.alertbuddy;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -14,6 +17,8 @@ import android.widget.Toast;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SoundSettingsActivity extends Activity {
 
@@ -32,17 +37,7 @@ public class SoundSettingsActivity extends Activity {
     }
 
     private void displayListView(){
-        ArrayList<SoundModel> soundList = new ArrayList<SoundModel>();
-
-        SoundModel model = new SoundModel("1","Ambulance",false);
-        soundList.add(model);
-        model = new SoundModel("2","Fire Alarm", false);
-        soundList.add(model);
-        model = new SoundModel("3","Police", false);
-        soundList.add(model);
-        model = new SoundModel("4","car horn", false);
-        soundList.add(model);
-
+        ArrayList<SoundModel> soundList = readSoundSettings();
 
         dataAdapter = new CustomAdapter(this, R.layout.sound_row, soundList);
         listView = (ListView) findViewById(R.id.listView1);
@@ -86,6 +81,11 @@ public class SoundSettingsActivity extends Activity {
         responseText.append("The following were selected...\n");
 
         ArrayList<SoundModel> soundList = dataAdapter.soundList;
+
+        //save sound settings in local database
+        storeSoundSettings(soundList);
+
+
         for (int i = 0; i < soundList.size(); i++) {
             SoundModel sound = soundList.get(i);
             if (sound.isSelected()) {
@@ -109,5 +109,40 @@ public class SoundSettingsActivity extends Activity {
             soundSelection += " ";
         }
         return  soundSelection;
+    }
+
+    public void storeSoundSettings(ArrayList<SoundModel> soundList){
+        SharedPreferences sharedPref = SoundSettingsActivity.this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+
+        for (int i = 0; i < soundList.size(); i++) {
+            SoundModel sound = soundList.get(i);
+            editor.putBoolean(sound.getName(), sound.isSelected());
+        }
+        editor.commit();
+    }
+
+    public ArrayList<SoundModel> readSoundSettings(){
+        SharedPreferences sharedPref = SoundSettingsActivity.this.getPreferences(Context.MODE_PRIVATE);
+        Map<String, ?> allEntries = sharedPref.getAll();
+        ArrayList<SoundModel> soundList = new ArrayList<SoundModel>();
+
+        for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
+            SoundModel model = new SoundModel("1",entry.getKey(), (Boolean)entry.getValue());
+            soundList.add(model);
+        }
+
+        if(soundList.size() == 0){
+            SoundModel model = new SoundModel("1","Ambulance",false);
+            soundList.add(model);
+            model = new SoundModel("2","Fire Alarm", false);
+            soundList.add(model);
+            model = new SoundModel("3","Police", false);
+            soundList.add(model);
+            model = new SoundModel("4","car horn", false);
+            soundList.add(model);
+        }
+
+        return soundList;
     }
 }
