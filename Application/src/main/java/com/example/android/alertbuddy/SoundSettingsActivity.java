@@ -1,23 +1,16 @@
 package com.example.android.alertbuddy;
 
 import android.app.Activity;
-import android.bluetooth.BluetoothDevice;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ListView;
-import android.widget.Toast;
-
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 public class SoundSettingsActivity extends Activity {
@@ -45,7 +38,8 @@ public class SoundSettingsActivity extends Activity {
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                SoundModel model = (SoundModel) parent.getItemAtPosition(position);
+                CheckBox cb  = (CheckBox)view.findViewById(R.id.checkBox1);
+                cb.performClick();
             }
         });
     }
