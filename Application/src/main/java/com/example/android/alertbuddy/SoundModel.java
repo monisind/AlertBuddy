@@ -5,23 +5,15 @@ package com.example.android.alertbuddy;
  */
 public class SoundModel {
 
-    String code = null;
     String name = null;
     boolean selected = false;
 
-    public SoundModel(String code, String name, boolean selected) {
+    public SoundModel(String name, boolean selected) {
         super();
-        this.code = code;
         this.name = name;
         this.selected = selected;
     }
 
-    public String getCode() {
-        return code;
-    }
-    public void setCode(String code) {
-        this.code = code;
-    }
     public String getName() {
         return name;
     }
