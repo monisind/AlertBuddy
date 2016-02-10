@@ -2,46 +2,46 @@
 <items version="2" >
 
     <item
-        jar="/Users/monisha/AndroidStudioProjects/AlertBuddy/Application/build/intermediates/exploded-aar/com.android.support/cardview-v7/23.0.0/jars/classes.jar"
-        jumboMode="false"
-        revision="23.0.0"
-        sha1="1ccbc26be2c465c622a48310e8092241b01abe80">
-        <dex dex="/Users/monisha/AndroidStudioProjects/AlertBuddy/Application/build/intermediates/pre-dexed/debug/classes-f1ad0d25c38c1425617415057423e06a644628e3.jar" />
-    </item>
-    <item
-        jar="/Users/monisha/AndroidStudioProjects/AlertBuddy/Application/build/intermediates/exploded-aar/com.android.support/support-v13/23.0.0/jars/libs/internal_impl-23.0.0.jar"
-        jumboMode="false"
-        revision="23.0.0"
-        sha1="5d4bccb885c8a89d066ecb6c4addb553a99a79a2">
-        <dex dex="/Users/monisha/AndroidStudioProjects/AlertBuddy/Application/build/intermediates/pre-dexed/debug/internal_impl-23.0.0-5c18bdddcaf076d6229dabf63ed4d0496e1b7a4e.jar" />
-    </item>
-    <item
-        jar="/Users/monisha/AndroidStudioProjects/AlertBuddy/Application/build/intermediates/exploded-aar/com.android.support/support-v13/23.0.0/jars/classes.jar"
+        jar="C:\git\AlertBuddy\Application\build\intermediates\exploded-aar\com.android.support\support-v13\23.0.0\jars\classes.jar"
         jumboMode="false"
         revision="23.0.0"
         sha1="bb0ac3f3ee2d71854501cc28e52cc84a20209b41">
-        <dex dex="/Users/monisha/AndroidStudioProjects/AlertBuddy/Application/build/intermediates/pre-dexed/debug/classes-8e28d39c03a954243d369d66c22402d4e6243490.jar" />
+        <dex dex="C:\git\AlertBuddy\Application\build\intermediates\pre-dexed\debug\classes-ac9442d835c0bfb5442656256fbdfae4dc779c20.jar" />
     </item>
     <item
-        jar="/Users/monisha/Library/Android/sdk/extras/android/m2repository/com/android/support/support-annotations/23.0.0/support-annotations-23.0.0.jar"
+        jar="C:\git\AlertBuddy\Application\build\intermediates\exploded-aar\com.android.support\cardview-v7\23.0.0\jars\classes.jar"
         jumboMode="false"
         revision="23.0.0"
-        sha1="990e7f98a7bad86a40b1f0bcfeb039023afd0839">
-        <dex dex="/Users/monisha/AndroidStudioProjects/AlertBuddy/Application/build/intermediates/pre-dexed/debug/support-annotations-23.0.0-11cff51f3471053d72fc4902adb85b6647dcc46d.jar" />
+        sha1="1ccbc26be2c465c622a48310e8092241b01abe80">
+        <dex dex="C:\git\AlertBuddy\Application\build\intermediates\pre-dexed\debug\classes-dd2c0a7d90cac10dbb9b0085b10a5e94b601e7d5.jar" />
     </item>
     <item
-        jar="/Users/monisha/AndroidStudioProjects/AlertBuddy/Application/build/intermediates/exploded-aar/com.android.support/support-v4/23.0.0/jars/classes.jar"
-        jumboMode="false"
-        revision="23.0.0"
-        sha1="8413c27b45b7fe61dca4a98159f65e2cee215f5a">
-        <dex dex="/Users/monisha/AndroidStudioProjects/AlertBuddy/Application/build/intermediates/pre-dexed/debug/classes-2a9038f8e20c385437a61f0f0e3e528480f02ac1.jar" />
-    </item>
-    <item
-        jar="/Users/monisha/AndroidStudioProjects/AlertBuddy/Application/build/intermediates/exploded-aar/com.android.support/support-v4/23.0.0/jars/libs/internal_impl-23.0.0.jar"
+        jar="C:\git\AlertBuddy\Application\build\intermediates\exploded-aar\com.android.support\support-v4\23.0.0\jars\libs\internal_impl-23.0.0.jar"
         jumboMode="false"
         revision="23.0.0"
         sha1="8bd336eeae661e8311330284897ee07f8ebaa297">
-        <dex dex="/Users/monisha/AndroidStudioProjects/AlertBuddy/Application/build/intermediates/pre-dexed/debug/internal_impl-23.0.0-e130855c8463f51b3ef1249324f2103e7137d86b.jar" />
+        <dex dex="C:\git\AlertBuddy\Application\build\intermediates\pre-dexed\debug\internal_impl-23.0.0-823833c6df1f20bedf0c4b7c00f5fea757fee6ff.jar" />
+    </item>
+    <item
+        jar="C:\git\AlertBuddy\Application\build\intermediates\exploded-aar\com.android.support\support-v13\23.0.0\jars\libs\internal_impl-23.0.0.jar"
+        jumboMode="false"
+        revision="23.0.0"
+        sha1="5d4bccb885c8a89d066ecb6c4addb553a99a79a2">
+        <dex dex="C:\git\AlertBuddy\Application\build\intermediates\pre-dexed\debug\internal_impl-23.0.0-1483649d60f5d888360e671ce7c8eaa7f459afff.jar" />
+    </item>
+    <item
+        jar="C:\git\AlertBuddy\Application\build\intermediates\exploded-aar\com.android.support\support-v4\23.0.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.0"
+        sha1="8413c27b45b7fe61dca4a98159f65e2cee215f5a">
+        <dex dex="C:\git\AlertBuddy\Application\build\intermediates\pre-dexed\debug\classes-2ef4f021a8d8a516f9a564a4e7c5416884517ce3.jar" />
+    </item>
+    <item
+        jar="C:\Users\l3ori\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\23.0.0\support-annotations-23.0.0.jar"
+        jumboMode="false"
+        revision="23.0.0"
+        sha1="990e7f98a7bad86a40b1f0bcfeb039023afd0839">
+        <dex dex="C:\git\AlertBuddy\Application\build\intermediates\pre-dexed\debug\support-annotations-23.0.0-42b8ec40a7fa1efc887d38572f780fef0de4ba6b.jar" />
     </item>
 
 </items>

@@ -156,6 +156,8 @@ public class DisplaySoundActivity extends Activity {
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "^^^^^*****^^^^^ received something");
+
             final String action = intent.getAction();
             if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                 mConnected = true;
@@ -178,6 +180,8 @@ public class DisplaySoundActivity extends Activity {
                // byte[] value = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
                 if(value != null){
                     displayData(value);
+                    Log.d(TAG, "value = " + value);
+                    mBluetoothLeService.updateNotification(value);
                 }else{
                     Log.d(TAG, "value = null");
                 }
@@ -208,7 +212,8 @@ public class DisplaySoundActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(mGattUpdateReceiver);
+        // changed: this thing stopped the receiver from getting any update
+        // unregisterReceiver(mGattUpdateReceiver);
     }
 
     @Override
