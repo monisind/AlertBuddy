@@ -370,7 +370,6 @@ public class BluetoothLeService extends Service {
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "^^^^^*****^^^^^ service destroyed");
-        //changed: cancelNotification();
     }
 
     @Override
@@ -443,14 +442,9 @@ public class BluetoothLeService extends Service {
 
     protected void updateNotification(String value) {
 
-        // Use NotificationCompat.Builder to set up notification for the app
-//        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
-
         // set up icon if we want later
         mBuilder.setSmallIcon(R.drawable.ic_launcher);
 
-        // Intent activated when notification is clicked
-//        Intent intent = new Intent(this, DisplaySoundActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 this,
                 0,
@@ -461,7 +455,14 @@ public class BluetoothLeService extends Service {
         // Set up builder
         mBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher));
         mBuilder.setContentTitle("Environment Alert!");
-        mBuilder.setContentText("New alert " + value);
+//        mBuilder.setContentText("New alert " + value);
+        String alarmType;
+        if (value.contains("1")) alarmType = "Fire Alarm";
+        else if (value.contains("2")) alarmType = "Ambulance";
+        else if (value.contains("3")) alarmType = "Car Horn";
+        else if (value.contains("4")) alarmType = "Police";
+        else alarmType = value;
+        mBuilder.setContentText("Detected " + alarmType);
 
         // This part is for heads-up notification
         mBuilder.setDefaults(Notification.DEFAULT_VIBRATE);
@@ -479,6 +480,8 @@ public class BluetoothLeService extends Service {
     // I don't want to touch the code above this. They work.
     private void lockScreenNotification() {
         mBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
+        mBuilder.setAutoCancel(true);
+
     }
 
     private void cancelNotification(){
