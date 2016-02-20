@@ -66,7 +66,7 @@ public class BluetoothLeService extends Service {
     private BluetoothGattCharacteristic tx;
     private BluetoothGattCharacteristic rx;
 
-    public final static UUID UART_UUID = UUID.fromString(SampleGattAttributes.UART_CHARACTERISTIC);
+    public final static UUID UART_UUID = UUID.fromString(SampleGattAttributes.UART_SERVICE);
     public final static UUID TX_UUID = UUID.fromString(SampleGattAttributes.TX_CHARACTERISTIC);
     public final static UUID RX_UUID = UUID.fromString(SampleGattAttributes.RX_CHARACTERISTIC);
     public final static UUID CLIENT_UUID = UUID.fromString(SampleGattAttributes.CLIENT_CHARACTERISTIC_CONFIG);
@@ -294,13 +294,13 @@ public class BluetoothLeService extends Service {
      * Write to a given char
      * @param characteristic The characteristic to write to
      */
-    public void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
+    public boolean writeCharacteristic(BluetoothGattCharacteristic characteristic) {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
             Log.w(TAG, "BluetoothAdapter not initialized");
-            return;
+            return false;
         }
 
-        mBluetoothGatt.writeCharacteristic(characteristic);
+        return mBluetoothGatt.writeCharacteristic(characteristic);
     }
 
     /**

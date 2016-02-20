@@ -53,8 +53,7 @@
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="Detection Result: "
         android:id="@+id/textView3"
-        android:layout_marginBottom="92dp"
-        android:layout_alignParentBottom="true"
+        android:layout_alignTop="@+id/textViewResult"
         android:layout_alignStart="@+id/textViewRawData" />
 
     <TextView
@@ -63,6 +62,27 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="NONE"
         android:id="@+id/textViewResult"
-        android:layout_alignBottom="@+id/textView3"
+        android:layout_alignParentBottom="true"
         android:layout_toEndOf="@+id/textViewScanning" />
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Training"
+        android:id="@+id/checkBoxTrain"
+        android:layout_above="@+id/textView3"
+        android:layout_alignStart="@+id/textView3"
+        android:layout_marginBottom="40dp"
+        android:checked="false"
+        android:layout_toStartOf="@+id/buttonScan" />
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="IsSiren"
+        android:id="@+id/checkBoxIsSiren"
+        android:checked="false"
+        android:layout_alignTop="@+id/checkBoxTrain"
+        android:layout_alignEnd="@+id/textViewResult" />
+
 </RelativeLayout>

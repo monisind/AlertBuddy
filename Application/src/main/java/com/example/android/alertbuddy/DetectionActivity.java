@@ -20,6 +20,8 @@ import android.app.Activity;
 import android.app.ListActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
@@ -35,6 +37,7 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.CancellationSignal;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.text.method.ScrollingMovementMethod;
@@ -46,13 +49,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ListView;
+import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.OutputStreamWriter;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -74,8 +85,11 @@ public class DetectionActivity extends Activity {
 
     private static final String DEVICE_NAME = "AlertBuddy";
 
+    public final static UUID UART_UUID = UUID.fromString(SampleGattAttributes.UART_SERVICE);
     public final static UUID TX_UUID = UUID.fromString(SampleGattAttributes.TX_CHARACTERISTIC);
     public final static UUID RX_UUID = UUID.fromString(SampleGattAttributes.RX_CHARACTERISTIC);
+
+    private BluetoothGattCharacteristic txCharactertic = null;
 
     private static List<ScanFilter> scanFilters = new ArrayList<ScanFilter>();
     private static final ScanSettings mScanSettings = new ScanSettings.Builder().build();
@@ -84,6 +98,9 @@ public class DetectionActivity extends Activity {
     private TextView mtxtViewScanning ;
     private TextView mtxtViewResult ;
     private Button mbtnScan ;
+
+    private CheckBox mchkBoxTraining;
+    private CheckBox mchkBoxIsSiren;
 
     private ButtonListener mbtnListener;
 
@@ -173,6 +190,9 @@ public class DetectionActivity extends Activity {
         mbtnListener = new ButtonListener();
         mbtnScan.setOnClickListener(mbtnListener);
 
+        mchkBoxTraining = (CheckBox) findViewById(R.id.checkBoxTrain);
+        mchkBoxIsSiren = (CheckBox) findViewById(R.id.checkBoxIsSiren);
+
         Intent detectionServiceIntent = new Intent(this, DetectionService.class);
         bindService(detectionServiceIntent, mDetectionServiceConnection, BIND_AUTO_CREATE);
 
@@ -197,8 +217,7 @@ public class DetectionActivity extends Activity {
         }
         else
         {
-            final boolean result = mBluetoothLeService.connect(mBLeDevice.getAddress());
-            Log.d(TAG, "Connect request result=" + result);
+           connectToService();
         }
 
     }
@@ -206,7 +225,8 @@ public class DetectionActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(mGattUpdateReceiver);
+        //unbindService(mServiceConnection);
+        //unregisterReceiver(mGattUpdateReceiver);
 
     }
 
@@ -255,15 +275,69 @@ public class DetectionActivity extends Activity {
                 updateView(ViewContext.DISCONNECTED);
                 Log.d(TAG, "GATT DISCONNECTED");
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                // Show all the supported services and characteristics on the user interface.
-              //  displayGattServices(mBluetoothLeService.getSupportedGattServices());
-                //Log.d(TAG, "GATT SERVICES DISCONNECTED");
+                List<BluetoothGattService>  services = mBluetoothLeService.getSupportedGattServices();
+                getCharacteristics(services);
+                Log.d(TAG, "GATT SERVICES DISCOVERED");
+                displayGattServices(services);
+                sendClearToSend();
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                 onDataRecived(intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA));
                 //Log.d(TAG, "GATT DATA AVAILABLE");
             }
         }
     };
+
+    // Demonstrates how to iterate through the supported GATT Services/Characteristics.
+    // In this sample, we populate the data structure that is bound to the ExpandableListView
+    // on the UI.
+    private void displayGattServices(List<BluetoothGattService> gattServices) {
+        if (gattServices == null) return;
+        String uuid = null;
+        String unknownServiceString = getResources().getString(R.string.unknown_service);
+        String unknownCharaString = getResources().getString(R.string.unknown_characteristic);
+        ArrayList<HashMap<String, String>> gattServiceData = new ArrayList<>();
+        ArrayList<ArrayList<HashMap<String, String>>> gattCharacteristicData
+                = new ArrayList<>();
+        ArrayList<ArrayList<BluetoothGattCharacteristic>> mGattCharacteristics = new ArrayList<>();
+
+        // Loops through available GATT Services.
+        for (BluetoothGattService gattService : gattServices) {
+            HashMap<String, String> currentServiceData = new HashMap<String, String>();
+            uuid = gattService.getUuid().toString();
+            currentServiceData.put(
+                    "NAME", SampleGattAttributes.lookup(uuid, unknownServiceString));
+            currentServiceData.put("UUID", uuid);
+            gattServiceData.add(currentServiceData);
+
+            Log.d(TAG, "Discovered Service - NAME: " + SampleGattAttributes.lookup(uuid, unknownServiceString)
+                    + " UUID: "+ uuid);
+
+            ArrayList<HashMap<String, String>> gattCharacteristicGroupData =
+                    new ArrayList<HashMap<String, String>>();
+            List<BluetoothGattCharacteristic> gattCharacteristics =
+                    gattService.getCharacteristics();
+            ArrayList<BluetoothGattCharacteristic> charas =
+                    new ArrayList<BluetoothGattCharacteristic>();
+
+            // Loops through available Characteristics.
+            for (BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
+                charas.add(gattCharacteristic);
+                HashMap<String, String> currentCharaData = new HashMap<String, String>();
+                uuid = gattCharacteristic.getUuid().toString();
+                currentCharaData.put(
+                        "NAME", SampleGattAttributes.lookup(uuid, unknownCharaString));
+                currentCharaData.put("UUID", uuid);
+
+                Log.d(TAG, "Discovered Charactersitic - NAME: " + SampleGattAttributes.lookup(uuid, unknownCharaString)
+                        + " UUID: " + uuid);
+
+                gattCharacteristicGroupData.add(currentCharaData);
+            }
+            mGattCharacteristics.add(charas);
+            gattCharacteristicData.add(gattCharacteristicGroupData);
+        }
+
+    }
 
 
     private ArrayList<Float> dataValues = new ArrayList<Float>();
@@ -277,6 +351,51 @@ public class DetectionActivity extends Activity {
             hexChars[j * 2 + 1] = hexArray[v & 0x0F];
         }
         return new String(hexChars);
+    }
+
+
+    /* Checks if external storage is available for read and write */
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+
+    private void saveMFCCs(float[] mfcccs)
+    {
+        Log.d(TAG, "Writing to file: " + getExternalFilesDir(null));
+
+        File file = new File(getExternalFilesDir(null), "mfccs.txt");
+
+        if(mchkBoxTraining.isChecked())
+        {
+            file = new File(getExternalFilesDir(null), "no_siren_mfccs.txt");
+            if(mchkBoxIsSiren.isChecked())
+            {
+                file = new File(getExternalFilesDir(null), "siren_mfccs.txt");
+            }
+        }
+
+        if(isExternalStorageWritable()) {
+            try {
+
+                FileOutputStream fOut = new FileOutputStream(file, true);
+                OutputStreamWriter osw = new OutputStreamWriter(fOut);
+                osw.write(Arrays.toString(mfcccs));
+                osw.write("\n");
+                osw.flush();
+                osw.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        else
+        {
+            Log.d(TAG, "Unable to write file, external storage not writable");
+        }
     }
 
     private int detectionConfidence = 0;
@@ -304,6 +423,31 @@ public class DetectionActivity extends Activity {
             detectionConfidence = 0;
         }
 
+        Log.d(TAG, "Detection confidence: " + detectionConfidence);
+        saveMFCCs(mfccs);
+    }
+
+    private void sendClearToSend()
+    {
+        byte[] cts_delim = {(byte)'1',(byte)'2', (byte)'3', (byte)'4'};
+        if (txCharactertic != null) {
+
+                txCharactertic.setValue(cts_delim);
+                boolean result = false;
+                do {
+                     result = mBluetoothLeService.writeCharacteristic(txCharactertic);
+                }
+                while(!result);
+                if(result) {
+                    Log.d(TAG, "Sent CTS");
+                }
+                else{
+                    Log.d(TAG, "CTS send failed");
+                }
+
+        } else {
+            Log.d(TAG, "Failed to send CTS");
+        }
     }
 
     private void onDataRecived(byte[] data)
@@ -339,6 +483,7 @@ public class DetectionActivity extends Activity {
 
             runDetection(vals);
             dataValues.clear();
+            sendClearToSend();
         }
     }
 
@@ -358,6 +503,7 @@ public class DetectionActivity extends Activity {
                 mBLeDevice = d;
                 connectToService();
                 mScanning = false;
+                updateView(ViewContext.DEVICE_FOUND);
                 mBluetoothScanner.stopScan(mBLeScanCallback);
             }
         }
@@ -373,9 +519,29 @@ public class DetectionActivity extends Activity {
         }
     };
 
+    private void getCharacteristics(List<BluetoothGattService> gattServices) {
+
+        if (gattServices == null) return;
+
+        List<BluetoothGattCharacteristic> gattCharacteristics = new ArrayList<BluetoothGattCharacteristic>();
+
+        for (BluetoothGattService gattService : gattServices) {
+            if(gattService.getUuid().equals(UART_UUID) ){
+                gattCharacteristics =  gattService.getCharacteristics();
+                for(BluetoothGattCharacteristic gattCharacteristic: gattCharacteristics){
+                    if(gattCharacteristic.getUuid().equals(TX_UUID)){
+                        txCharactertic = gattCharacteristic;
+                    }
+                }
+
+            }
+        }
+    }
+
     private enum ViewContext
     {
         SCANNING,
+        DEVICE_FOUND,
         NOTFOUND,
         CONNECTED,
         DISCONNECTED,
@@ -391,6 +557,10 @@ public class DetectionActivity extends Activity {
                 mtxtViewScanning.setText("Scanning ...");
                 mbtnScan.setVisibility(View.GONE);
                 break;
+            case DEVICE_FOUND:
+                mtxtViewScanning.setText("Device found!");
+                mbtnScan.setVisibility(View.GONE);
+                break;
             case NOTFOUND:
                 mtxtViewScanning.setText("Not found!");
                 mbtnScan.setVisibility(View.VISIBLE);
@@ -401,7 +571,7 @@ public class DetectionActivity extends Activity {
                 break;
             case DISCONNECTED:
                 mtxtViewScanning.setText("Disconnected!");
-                //mbtnScan.setVisibility(View.VISIBLE);
+                mbtnScan.setVisibility(View.VISIBLE);
                 break;
             case SIREN_DETECTED:
                 mtxtViewResult.setText("DETECTED");
