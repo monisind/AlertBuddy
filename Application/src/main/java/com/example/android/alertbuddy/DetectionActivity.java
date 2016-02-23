@@ -51,6 +51,8 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -99,15 +101,19 @@ public class DetectionActivity extends Activity {
     private TextView mtxtViewResult ;
     private Button mbtnScan ;
 
+    private RadioGroup mRadioGroup;
+
     private CheckBox mchkBoxTraining;
     private CheckBox mchkBoxIsSiren;
 
     private ButtonListener mbtnListener;
+    private View.OnClickListener mchkBoxListener;
 
 
     private BluetoothLeService mBluetoothLeService;
     private DetectionService mDetectionService;
 
+    private String mfccSaveFileName = "mfccs";
 
     // Code to manage Ble Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -190,8 +196,30 @@ public class DetectionActivity extends Activity {
         mbtnListener = new ButtonListener();
         mbtnScan.setOnClickListener(mbtnListener);
 
+        mRadioGroup = (RadioGroup) findViewById(R.id.radioGroup);
+
         mchkBoxTraining = (CheckBox) findViewById(R.id.checkBoxTrain);
         mchkBoxIsSiren = (CheckBox) findViewById(R.id.checkBoxIsSiren);
+
+        mchkBoxListener = new View.OnClickListener() {
+            public void onClick(View v) {
+                if(mchkBoxTraining.isChecked() && mchkBoxIsSiren.isChecked())
+                {
+                    updateView(ViewContext.TRAINING_SIREN);
+                }
+                else if(mchkBoxTraining.isChecked())
+                {
+                    updateView(ViewContext.TRAINING_NO_SIREN);
+                }
+                else
+                {
+                    updateView(ViewContext.NO_TRAINING);
+                }
+            }
+        };
+
+        mchkBoxTraining.setOnClickListener(mchkBoxListener);
+        mchkBoxIsSiren.setOnClickListener(mchkBoxListener);
 
         Intent detectionServiceIntent = new Intent(this, DetectionService.class);
         bindService(detectionServiceIntent, mDetectionServiceConnection, BIND_AUTO_CREATE);
@@ -364,6 +392,17 @@ public class DetectionActivity extends Activity {
     }
 
 
+    public static String convertToCommaDelimited(float[] list) {
+        StringBuffer ret = new StringBuffer("");
+        for (int i = 0; list != null && i < list.length; i++) {
+            ret.append(list[i]);
+            if (i < list.length - 1) {
+                ret.append(',');
+            }
+        }
+        return ret.toString();
+    }
+
     private void saveMFCCs(float[] mfcccs)
     {
         Log.d(TAG, "Writing to file: " + getExternalFilesDir(null));
@@ -375,7 +414,7 @@ public class DetectionActivity extends Activity {
             file = new File(getExternalFilesDir(null), "no_siren_mfccs.txt");
             if(mchkBoxIsSiren.isChecked())
             {
-                file = new File(getExternalFilesDir(null), "siren_mfccs.txt");
+                file = new File(getExternalFilesDir(null), mfccSaveFileName +".txt");
             }
         }
 
@@ -384,7 +423,7 @@ public class DetectionActivity extends Activity {
 
                 FileOutputStream fOut = new FileOutputStream(file, true);
                 OutputStreamWriter osw = new OutputStreamWriter(fOut);
-                osw.write(Arrays.toString(mfcccs));
+                osw.write(convertToCommaDelimited(mfcccs));
                 osw.write("\n");
                 osw.flush();
                 osw.close();
@@ -546,7 +585,10 @@ public class DetectionActivity extends Activity {
         CONNECTED,
         DISCONNECTED,
         SIREN_DETECTED,
-        SIREN_NOT_DETECTED
+        SIREN_NOT_DETECTED,
+        TRAINING_SIREN,
+        TRAINING_NO_SIREN,
+        NO_TRAINING
     }
 
     private void updateView(ViewContext c)
@@ -555,11 +597,11 @@ public class DetectionActivity extends Activity {
         {
             case SCANNING:
                 mtxtViewScanning.setText("Scanning ...");
-                mbtnScan.setVisibility(View.GONE);
+                mbtnScan.setVisibility(View.INVISIBLE);
                 break;
             case DEVICE_FOUND:
                 mtxtViewScanning.setText("Device found!");
-                mbtnScan.setVisibility(View.GONE);
+                mbtnScan.setVisibility(View.INVISIBLE);
                 break;
             case NOTFOUND:
                 mtxtViewScanning.setText("Not found!");
@@ -567,7 +609,7 @@ public class DetectionActivity extends Activity {
                 break;
             case CONNECTED:
                 mtxtViewScanning.setText("Connected!");
-                mbtnScan.setVisibility(View.GONE);
+                mbtnScan.setVisibility(View.INVISIBLE);
                 break;
             case DISCONNECTED:
                 mtxtViewScanning.setText("Disconnected!");
@@ -578,8 +620,27 @@ public class DetectionActivity extends Activity {
                 break;
             case SIREN_NOT_DETECTED:
                 mtxtViewResult.setText("NONE");
+                break;
+            case TRAINING_SIREN:
+                mRadioGroup.setVisibility(View.VISIBLE);
+                break;
+            case TRAINING_NO_SIREN:
+                mRadioGroup.setVisibility(View.INVISIBLE);
+                break;
+            case NO_TRAINING:
+                mRadioGroup.setVisibility(View.INVISIBLE);
+
         }
 
+    }
+
+    public void onRadioButtonClicked(View view) {
+        // Is the button now checked?
+        boolean checked = ((RadioButton) view).isChecked();
+        String name = ((RadioButton) view).getText().toString();
+        if (checked) {
+            mfccSaveFileName = name;
+        }
     }
 
     private class ButtonListener implements View.OnClickListener
