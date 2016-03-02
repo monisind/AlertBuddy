@@ -36,19 +36,23 @@
 
     <!-- <application android:theme="@style/CustomActionBarTheme" ... /> -->
     <application
+        android:debuggable="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/MyTheme">
 
         <!-- android:theme="@android:style/Theme.Holo.Light"> -->
         <activity
-            android:name=".DeviceScanActivity"
-            android:label="@string/app_name">
+            android:name=".SplashScreen"
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".DeviceScanActivity"
+            android:label="Scan Devices" >
         </activity>
         <activity android:name=".DeviceControlActivity" />
 

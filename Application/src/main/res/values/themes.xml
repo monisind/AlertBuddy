@@ -1,36 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--<resources>-->
-    <!--&lt;!&ndash; the theme applied to the application or activity &ndash;&gt;-->
-    <!--<style name="CustomActionBarTheme"-->
-        <!--parent="@android:style/Theme.Holo.Light.DarkActionBar">-->
-        <!--<item name="android:actionBarStyle">@style/MyActionBar</item>-->
-    <!--</style>-->
-
-    <!--&lt;!&ndash; ActionBar styles &ndash;&gt;-->
-    <!--<style name="MyActionBar"-->
-        <!--parent="@android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">-->
-        <!--<item name="android:background">@drawable/actionbar_background</item>-->
-    <!--</style>-->
-<!--</resources>-->
 
 <resources>
-    <style name="MyTheme" parent="@android:style/Theme.Holo.Light">
-        <item name="android:actionBarStyle">@style/MyActionBar</item>
-        <item name="android:actionMenuTextColor">@color/action_bar_text</item>
+    <style name="MyTheme" parent="android:Theme.Material.Light.DarkActionBar">
+        <item name="android:colorAccent">@color/accent</item>
     </style>
 
-    <style name="MyActionBar" parent="@android:style/Widget.Holo.Light.ActionBar">
-        <item name="android:background">@color/action_bar</item>
-        <item name="android:titleTextStyle">@style/MyActionBarTitleText</item>
+    <style name="progress" parent="android:Theme.Dialog">
+        <item name="android:windowBackground">@color/transparent</item>
+        <item name="android:textColorPrimary">@color/red</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textAlignment">gravity</item>
     </style>
 
-    <style name="MyActionBarTitleText" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
-        <item name="android:textColor">@color/action_bar_text</item>
-    </style>
+    <!--<style name="progress" parent="android:Theme.Holo.Dialog">-->
+        <!--<item name="android:alertDialogStyle">@style/CustomAlertDialogStyle</item>-->
+        <!--<item name="android:windowBackground">@color/transparent</item>-->
+        <!--<item name="android:textColorPrimary">@color/red</item>-->
+        <!--<item name="android:backgroundDimEnabled">false</item>-->
+        <!--<item name="android:textColor">@color/accent</item>-->
+        <!--<item name="android:textStyle">normal</item>-->
+        <!--<item name="android:textSize">20sp</item>-->
+        <!--<item name="android:textAlignment">viewStart</item>-->
 
-    <style name="MyActionBarTabText" parent="@android:style/Widget.Holo.ActionBar.TabText">
-        <item name="android:textColor">@color/action_bar_text</item>
-    </style>
+    <!--</style>-->
+
+    <!--<style name="CustomAlertDialogStyle">-->
+        <!--<item name="android:bottomBright">@color/transparent</item>-->
+        <!--<item name="android:bottomDark">@color/transparent</item>-->
+        <!--<item name="android:bottomMedium">@color/transparent</item>-->
+        <!--<item name="android:centerBright">@color/transparent</item>-->
+        <!--<item name="android:centerDark">@color/transparent</item>-->
+        <!--<item name="android:centerMedium">@color/transparent</item>-->
+        <!--<item name="android:fullBright">@color/transparent</item>-->
+        <!--<item name="android:fullDark">@color/transparent</item>-->
+        <!--<item name="android:topBright">@color/transparent</item>-->
+        <!--<item name="android:topDark">@color/transparent</item>-->
+        <!--<item name="android:colorAccent">@color/accent</item>-->
+
+    <!--</style>-->
+
 </resources>
 
 

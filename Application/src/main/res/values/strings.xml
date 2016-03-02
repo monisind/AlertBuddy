@@ -20,7 +20,7 @@
     <string name="no_data">No data</string>
     <string name="connected">Connected</string>
     <string name="disconnected">Disconnected</string>
-    <string name="title_devices">Scan BLE Device</string>
+    <string name="title_devices">Scan Device</string>
     <string name="error_bluetooth_not_supported">Bluetooth not supported.</string>
 
     <string name="unknown_device">Unknown device</string>
@@ -50,5 +50,10 @@
 
     <string name="sound_settings_sub_header">Select sounds</string>
     <string name="menu_save_sound">Save</string>
-    <string name="title_activity_main2">Main2Activity</string>
+
+    <string name="device_name">BLE UART</string>
+    <string name="last_connected_device">Last Connected Device</string>
+    <string name="title_activity_blesettings">BLESettings</string>
+    <string name="title_activity_splash_screen">SplashScreen</string>
+
 </resources>
