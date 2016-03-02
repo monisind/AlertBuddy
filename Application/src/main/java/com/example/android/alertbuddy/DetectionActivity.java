@@ -451,12 +451,12 @@ public class DetectionActivity extends Activity {
             detectionConfidence --;
         }
 
-        if(detectionConfidence == 3)
+        if(detectionConfidence == 1)
         {
             updateView(ViewContext.SIREN_DETECTED);
             detectionConfidence = 0;
         }
-        else if(detectionConfidence == -3)
+        else if(detectionConfidence == -1)
         {
             updateView(ViewContext.SIREN_NOT_DETECTED);
             detectionConfidence = 0;
