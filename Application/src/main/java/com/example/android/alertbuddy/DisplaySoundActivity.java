@@ -23,6 +23,8 @@ import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +38,7 @@ public class DisplaySoundActivity extends Activity {
     public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
     public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
 
-    public final static UUID UART_UUID = UUID.fromString(SampleGattAttributes.UART_CHARACTERISTIC);
+    public final static UUID UART_UUID = UUID.fromString(SampleGattAttributes.UART_SERVICE);
     public final static UUID TX_UUID = UUID.fromString(SampleGattAttributes.TX_CHARACTERISTIC);
     public final static UUID RX_UUID = UUID.fromString(SampleGattAttributes.RX_CHARACTERISTIC);
 
@@ -45,6 +47,7 @@ public class DisplaySoundActivity extends Activity {
 
     private BluetoothLeService mBluetoothLeService;
     private ArrayList<ArrayList<BluetoothGattCharacteristic>> mGattCharacteristics = new ArrayList<ArrayList<BluetoothGattCharacteristic>>();
+    private Detection detection = new Detection();
     private List<BluetoothGattService> services;
     private boolean mConnected = false;
     private BluetoothGattCharacteristic mNotifyCharacteristic;
@@ -173,19 +176,80 @@ public class DisplaySoundActivity extends Activity {
                 getCharacteristics(services);
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                 // ** changed //
-                Log.d(TAG, "&&&&&&&&&&&&&&&&&&&&&  receive data");
-                String value = intent.getStringExtra(BluetoothLeService.EXTRA_DATA);
-               // byte[] value = intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA);
-                if(value != null){
-                    displayData(value);
-                }else{
-                    Log.d(TAG, "value = null");
-                }
+                onDataRecived(intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA));
             }
         }
     };
 
 
+    private ArrayList<Float> dataValues = new ArrayList<Float>();
+    private void onDataRecived(byte[] data)
+    {
+        if(data.length == 4 && data[0] == (byte)0xDE && data[1] == (byte)0xAD && data[2] == (byte)0xBE && data[3] == (byte)0xEF) {
+            dataValues.clear();
+            return;
+        }
+        else
+        {
+            for(int i=4 ; i <= data.length; i+=4)
+            {
+                dataValues.add(ByteBuffer.wrap(data, i - 4, 4).order(ByteOrder.LITTLE_ENDIAN).getFloat());
+            }
+        }
+
+        //Log.d(TAG, "DATA  " + bytesToHex(data) + " SIZE  " + dataValues.size()) ;
+
+        if(dataValues.size() == Detection.MFCC_SIZE)
+        {
+            String txt = "";
+            for(float val: dataValues)
+            {
+                txt += val + ",";
+            }
+
+            float[] vals = new float[dataValues.size()];
+            for(int i=0; i< dataValues.size(); i++)
+            {
+                vals[i] = dataValues.get(i);
+            }
+
+            runDetection(vals);
+            dataValues.clear();
+            sendClearToSend();
+        }
+    }
+
+
+    private void runDetection(float[] mfccs)
+    {
+        float classificationResult = detection.classify(mfccs);
+        Log.d(TAG, "CLASSIFICATION " + classificationResult);
+
+        //saveMFCCs(mfccs);
+    }
+
+    private void sendClearToSend()
+    {
+        byte[] cts_delim = {(byte)'1',(byte)'2', (byte)'3', (byte)'4'};
+        if (target_character != null) {
+
+            target_character.setValue(cts_delim);
+            boolean result = false;
+            do {
+                result = mBluetoothLeService.writeCharacteristic(target_character);
+            }
+            while(!result);
+            if(result) {
+                Log.d(TAG, "Sent CTS");
+            }
+            else{
+                Log.d(TAG, "CTS send failed");
+            }
+
+        } else {
+            Log.d(TAG, "Failed to send CTS");
+        }
+    }
 //    private void displayData(byte[] data) {
 //        if (data != null) {
 //            String dataArray = new String(data);

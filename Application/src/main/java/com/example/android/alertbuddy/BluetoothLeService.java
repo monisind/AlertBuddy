@@ -41,9 +41,17 @@ import java.util.UUID;
  */
 public class BluetoothLeService extends Service {
     private final static String TAG = BluetoothLeService.class.getSimpleName();
+
+    private BluetoothManager mBluetoothManager;
+    private BluetoothAdapter mBluetoothAdapter;
+    private String mBluetoothDeviceAddress;
+    private BluetoothGatt mBluetoothGatt;
+    private int mConnectionState = STATE_DISCONNECTED;
+
     private static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTING = 1;
     private static final int STATE_CONNECTED = 2;
+
     public final static String ACTION_GATT_CONNECTED =
             "com.example.bluetooth.le.ACTION_GATT_CONNECTED";
     public final static String ACTION_GATT_DISCONNECTED =
@@ -55,21 +63,13 @@ public class BluetoothLeService extends Service {
     public final static String EXTRA_DATA =
             "com.example.bluetooth.le.EXTRA_DATA";
 
-    public final static UUID UART_UUID = UUID.fromString(SampleGattAttributes.UART_CHARACTERISTIC);
-    public final static UUID TX_UUID = UUID.fromString(SampleGattAttributes.TX_CHARACTERISTIC);
-    public final static UUID RX_UUID = UUID.fromString(SampleGattAttributes.RX_CHARACTERISTIC);
-    public final static UUID CLIENT_UUID = UUID.fromString(SampleGattAttributes.CLIENT_CHARACTERISTIC_CONFIG);
-
-    private BluetoothManager mBluetoothManager;
-    private BluetoothAdapter mBluetoothAdapter;
-    private String mBluetoothDeviceAddress;
-    private BluetoothGatt mBluetoothGatt;
-    private int mConnectionState = STATE_DISCONNECTED;
     private BluetoothGattCharacteristic tx;
     private BluetoothGattCharacteristic rx;
 
-
-
+    public final static UUID UART_UUID = UUID.fromString(SampleGattAttributes.UART_SERVICE);
+    public final static UUID TX_UUID = UUID.fromString(SampleGattAttributes.TX_CHARACTERISTIC);
+    public final static UUID RX_UUID = UUID.fromString(SampleGattAttributes.RX_CHARACTERISTIC);
+    public final static UUID CLIENT_UUID = UUID.fromString(SampleGattAttributes.CLIENT_CHARACTERISTIC_CONFIG);
 
     // Implements callback methods for GATT events that the app cares about.  For example,
     // connection change and services discovered.
@@ -93,16 +93,6 @@ public class BluetoothLeService extends Service {
                 broadcastUpdate(intentAction);
             }
         }
-
-//        @Override
-//        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-//            if (status == BluetoothGatt.GATT_SUCCESS) {
-//                broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
-//            } else {
-//                Log.w(TAG, "onServicesDiscovered received: " + status);
-//            }
-//        }
-
 
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
@@ -131,9 +121,8 @@ public class BluetoothLeService extends Service {
             else {
                 Log.w(TAG, "Couldn't get RX client descriptor! ");
             }
+
         }
-
-
 
         @Override
         public void onCharacteristicRead(BluetoothGatt gatt,
@@ -160,19 +149,12 @@ public class BluetoothLeService extends Service {
                                  final BluetoothGattCharacteristic characteristic) {
         final Intent intent = new Intent(action);
 
-        if(RX_UUID.equals(characteristic.getUuid())){
-            final byte[] data = characteristic.getValue();
+        UUID uuid = characteristic.getUuid();
+        final byte[] data = characteristic.getValue();
+
+        if(uuid.equals(RX_UUID)){
             if (data != null && data.length > 0) {
-                intent.putExtra(EXTRA_DATA, new String(data));
-            }
-        } else {
-            //************check to see if "else if" needed instead of else
-            final byte[] data = characteristic.getValue();
-            if (data != null && data.length > 0) {
-                final StringBuilder stringBuilder = new StringBuilder(data.length);
-                for(byte byteChar : data)
-                    stringBuilder.append(String.format("%02X ", byteChar));
-                intent.putExtra(EXTRA_DATA, new String(data) + "\n" + stringBuilder.toString());
+                intent.putExtra(EXTRA_DATA, data);
             }
         }
         sendBroadcast(intent);
@@ -312,13 +294,13 @@ public class BluetoothLeService extends Service {
      * Write to a given char
      * @param characteristic The characteristic to write to
      */
-    public void writeCharacteristic(BluetoothGattCharacteristic characteristic) {
+    public boolean writeCharacteristic(BluetoothGattCharacteristic characteristic) {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
             Log.w(TAG, "BluetoothAdapter not initialized");
-            return;
+            return false;
         }
 
-        mBluetoothGatt.writeCharacteristic(characteristic);
+        return mBluetoothGatt.writeCharacteristic(characteristic);
     }
 
     /**

@@ -67,10 +67,6 @@
             android:name=".SoundSettingsActivity"
             android:label="@string/title_activity_sound_settings" />
 
-        <service
-            android:name=".DetectionService"
-            android:enabled="true"
-            android:exported="true"></service>
     </application>
 
 </manifest>
