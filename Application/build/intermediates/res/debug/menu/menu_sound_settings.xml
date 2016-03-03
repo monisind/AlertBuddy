@@ -1,0 +1,9 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.android.alertbuddy.SoundSettingsActivity">
+    <item android:id="@+id/menu_save_sound"
+        android:title="@string/menu_save_sound"
+        android:orderInCategory="100"
+        android:showAsAction="always"/>
+</menu>
+<!-- From: file:/C:/git/AlertBuddy/Application/src/main/res/menu/menu_sound_settings.xml -->

@@ -1,0 +1,13 @@
+LOCAL_PATH := $(call my-dir)
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := AlertBuddy
+PROJECT_FILES := $(wildcard $(LOCAL_PATH)/*.c)
+PROJECT_FILES += $(wildcard $(LOCAL_PATH)/matlab/*.c)
+PROJECT_FILES := $(PROJECT_FILES:$(LOCAL_PATH)/%=%)
+
+LOCAL_SRC_FILES := $(PROJECT_FILES)
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/matlab
+
+include ${BUILD_SHARED_LIBRARY}
