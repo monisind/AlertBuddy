@@ -437,32 +437,12 @@ public class DetectionActivity extends Activity {
         }
     }
 
-    private int detectionConfidence = 0;
+
     private void runDetection(float[] mfccs)
     {
         float classificationResult = mDetectionService.classify(mfccs);
         Log.d(TAG, "CLASSIFICATION " + classificationResult);
-        if(classificationResult == 1)
-        {
-            detectionConfidence ++;
-        }
-        else
-        {
-            detectionConfidence --;
-        }
 
-        if(detectionConfidence == 1)
-        {
-            updateView(ViewContext.SIREN_DETECTED);
-            detectionConfidence = 0;
-        }
-        else if(detectionConfidence == -1)
-        {
-            updateView(ViewContext.SIREN_NOT_DETECTED);
-            detectionConfidence = 0;
-        }
-
-        Log.d(TAG, "Detection confidence: " + detectionConfidence);
         saveMFCCs(mfccs);
     }
 

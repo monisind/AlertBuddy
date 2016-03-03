@@ -5,7 +5,7 @@
  * File: neural_net_classify.c
  *
  * MATLAB Coder version            : 2.8
- * C/C++ source code generated on  : 20-Feb-2016 01:28:22
+ * C/C++ source code generated on  : 01-Mar-2016 23:54:39
  */
 
 /* Include Files */
@@ -25,59 +25,62 @@
  */
 double neural_net_classify(const float MFCCs[1612])
 {
-  double type;
   float b_MFCCs[1488];
   int ixstart;
-  int ix;
-  float result[248];
-  float b_result[248];
-  float k[2];
+  int itmp;
+  float result[372];
+  float b_result[372];
+  float k[3];
   float mtmp;
+  int ix;
   boolean_T exitg1;
 
   /* MFCCs = extract_mfcc(int16(audioData), fs); */
   /* Ignore the first MFCC value */
   for (ixstart = 0; ixstart < 124; ixstart++) {
-    for (ix = 0; ix < 12; ix++) {
-      b_MFCCs[ix + 12 * ixstart] = MFCCs[(ix + 13 * ixstart) + 1];
+    for (itmp = 0; itmp < 12; itmp++) {
+      b_MFCCs[itmp + 12 * ixstart] = MFCCs[(itmp + 13 * ixstart) + 1];
     }
   }
 
   neural_net(b_MFCCs, result);
-  for (ixstart = 0; ixstart < 2; ixstart++) {
-    for (ix = 0; ix < 124; ix++) {
-      b_result[ix + 124 * ixstart] = result[ixstart + (ix << 1)];
+  for (ixstart = 0; ixstart < 3; ixstart++) {
+    for (itmp = 0; itmp < 124; itmp++) {
+      b_result[itmp + 124 * ixstart] = result[ixstart + 3 * itmp];
     }
   }
 
   sum(b_result, k);
   ixstart = 1;
   mtmp = k[0];
+  itmp = 1;
   if (rtIsNaNF(k[0])) {
     ix = 2;
     exitg1 = false;
-    while ((!exitg1) && (ix < 3)) {
-      ixstart = 2;
-      if (!rtIsNaNF(k[1])) {
-        mtmp = k[1];
+    while ((!exitg1) && (ix < 4)) {
+      ixstart = ix;
+      if (!rtIsNaNF(k[ix - 1])) {
+        mtmp = k[ix - 1];
+        itmp = ix;
         exitg1 = true;
       } else {
-        ix = 3;
+        ix++;
       }
     }
   }
 
-  if ((ixstart < 2) && (k[1] > mtmp)) {
-    mtmp = k[1];
+  if (ixstart < 3) {
+    while (ixstart + 1 < 4) {
+      if (k[ixstart] > mtmp) {
+        mtmp = k[ixstart];
+        itmp = ixstart + 1;
+      }
+
+      ixstart++;
+    }
   }
 
-  if (mtmp == k[0]) {
-    type = 1.0;
-  } else {
-    type = 2.0;
-  }
-
-  return type;
+  return itmp;
 }
 
 /*
