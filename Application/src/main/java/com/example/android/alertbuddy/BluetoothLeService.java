@@ -424,6 +424,14 @@ public class BluetoothLeService extends Service {
         Log.d(TAG, "^^^^^*****^^^^^ initialized notification");
     }
 
+    /**
+     * This function will be used to update the notification as required. Note that this
+     * function must be called explicitly by the class that does the detection.
+     * The parameter value used to be the value (1, 2, 3, 4) that's be passed back by
+     * the board. Depending on how we want to integrate the Detection algorithm with this,
+     * this can be changed accordingly.
+     * @param value
+     */
     protected void updateNotification(String value) {
 
         // set up icon if we want later

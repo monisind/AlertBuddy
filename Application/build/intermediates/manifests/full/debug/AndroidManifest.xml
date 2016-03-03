@@ -76,8 +76,7 @@
         </activity>
         <activity
             android:name="com.example.android.alertbuddy.SoundSettingsActivity"
-            android:label="@string/title_activity_sound_settings" >
-        </activity>
+            android:label="@string/title_activity_sound_settings" />
     </application>
 
 </manifest>
