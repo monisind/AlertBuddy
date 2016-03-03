@@ -8,3 +8,4 @@ Application/build/
 .idea
 #.idea/workspace.xml
 local.properties
+*.properties
