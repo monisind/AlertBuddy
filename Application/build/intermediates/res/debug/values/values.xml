@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- From: file:/C:/git/AlertBuddy/Application/src/main/res/values/colors.xml -->
+    <eat-comment/>
+    <color name="accent">#FFCC0000</color>
+    <!-- From: file:/C:/git/AlertBuddy/Application/build/intermediates/exploded-aar/com.android.support/cardview-v7/23.0.0/res/values/values.xml -->
+    <eat-comment/>
+    <color name="cardview_dark_background">#FF202020</color>
+    <color name="cardview_light_background">#FFFAFAFA</color>
+    <color name="cardview_shadow_end_color">#03000000</color>
+    <color name="cardview_shadow_start_color">#37000000</color>
+    <!-- From: file:/C:/git/AlertBuddy/Application/src/main/res/values/colors.xml -->
+    <eat-comment/>
+    <color name="primary">#020202</color>
+    <color name="primary_dark">#020202</color>
+    <color name="red">#FFCC0000</color>
+    <color name="textColorPrimary">#020202</color>
+    <color name="transparent">#00000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="windowBackground">#FFFFFF</color>
+    <declare-styleable name="CardView"><attr format="color" name="cardBackgroundColor"/><attr format="dimension" name="cardCornerRadius"/><attr format="dimension" name="cardElevation"/><attr format="dimension" name="cardMaxElevation"/><attr format="boolean" name="cardUseCompatPadding"/><attr format="boolean" name="cardPreventCornerOverlap"/><attr format="dimension" name="contentPadding"/><attr format="dimension" name="contentPaddingLeft"/><attr format="dimension" name="contentPaddingRight"/><attr format="dimension" name="contentPaddingTop"/><attr format="dimension" name="contentPaddingBottom"/></declare-styleable>
+    <!-- From: file:/C:/git/AlertBuddy/Application/src/main/res/values/dimens.xml -->
+    <eat-comment/>
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <!-- From: file:/C:/git/AlertBuddy/Application/build/intermediates/exploded-aar/com.android.support/cardview-v7/23.0.0/res/values/values.xml -->
+    <eat-comment/>
+    <dimen name="cardview_compat_inset_shadow">1dp</dimen>
+    <dimen name="cardview_default_elevation">2dp</dimen>
+    <dimen name="cardview_default_radius">2dp</dimen>
+    <!-- From: file:/C:/git/AlertBuddy/Application/src/main/res/values/template-dimens.xml -->
+    <eat-comment/>
+    <dimen name="horizontal_page_margin">@dimen/margin_medium</dimen>
+    <dimen name="margin_huge">64dp</dimen>
+    <dimen name="margin_large">32dp</dimen>
+    <dimen name="margin_medium">16dp</dimen>
+    <dimen name="margin_small">8dp</dimen>
+    <dimen name="margin_tiny">4dp</dimen>
+    <dimen name="vertical_page_margin">@dimen/margin_medium</dimen>
+    <!-- From: file:/C:/git/AlertBuddy/Application/src/main/res/values/strings.xml -->
+    <eat-comment/>
+    <string name="action_settings">Settings</string>
+    <string name="action_settings_ble">BLE</string>
+    <string name="action_settings_sound">Sound Settings</string>
+    <string name="action_settings_vibration">Vibration Pattern</string>
+    <!-- From: file:/C:/git/AlertBuddy/Application/src/main/res/values/base-strings.xml -->
+    <eat-comment/>
+    <string name="app_name">Alert Buddy</string>
+    <!-- From: file:/C:/git/AlertBuddy/Application/src/main/res/values/strings.xml -->
+    <eat-comment/>
+    <string name="ble_not_supported">BLE is not supported</string>
+    <string name="button_send">Send</string>
+    <string name="connected">Connected</string>
+    <string name="device_name">BLE UART</string>
+    <string name="disconnected">Disconnected</string>
+    <string name="error_bluetooth_not_supported">Bluetooth not supported.</string>
+    <string name="hello_world">Hello world!</string>
+    <!-- From: file:/C:/git/AlertBuddy/Application/src/main/res/values/base-strings.xml -->
+    <eat-comment/>
+    <string name="intro_message">
+        <![CDATA[
+        
+            
+            This sample demonstrates how to use the Bluetooth LE Generic Attribute Profile (GATT)
+            to transmit arbitrary data between devices.
+            
+        
+        ]]>
+    </string>
+    <!-- From: file:/C:/git/AlertBuddy/Application/src/main/res/values/strings.xml -->
+    <eat-comment/>
+    <string name="label_data">Data:</string>
+    <string name="label_device_address">Device address:</string>
+    <string name="label_state">State:</string>
+    <string name="last_connected_device">Last Connected Device</string>
+    <string name="menu_connect">Connect</string>
+    <string name="menu_disconnect">Disconnect</string>
+    <string name="menu_save_sound">Save</string>
+    <string name="menu_scan">Scan</string>
+    <string name="menu_stop">Stop</string>
+    <string name="no_data">No data</string>
+    <string name="response_message"/>
+    <string name="send_message">Enter a message</string>
+    <string name="sound_settings_sub_header">Select sounds</string>
+    <string name="title_activity_blesettings">BLESettings</string>
+    <string name="title_activity_display_sound">Main</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_sound_settings">Sound Settings</string>
+    <string name="title_activity_splash_screen">SplashScreen</string>
+    <string name="title_devices">Scan Device</string>
+    <string name="unknown_characteristic">Unknown characteristic</string>
+    <string name="unknown_device">Unknown device</string>
+    <string name="unknown_service">Unknown service</string>
+    <!-- From: file:/C:/git/AlertBuddy/Application/src/main/res/values/template-styles.xml -->
+    <eat-comment/>
+    <style name="AppTheme" parent="Theme.Sample"/>
+    <!-- From: file:/C:/git/AlertBuddy/Application/build/intermediates/exploded-aar/com.android.support/cardview-v7/23.0.0/res/values/values.xml -->
+    <eat-comment/>
+    <style name="CardView">
+        <item name="cardBackgroundColor">@color/cardview_light_background</item>
+        <item name="cardCornerRadius">@dimen/cardview_default_radius</item>
+        <item name="cardElevation">@dimen/cardview_default_elevation</item>
+        <item name="cardMaxElevation">@dimen/cardview_default_elevation</item>
+        <item name="cardUseCompatPadding">false</item>
+        <item name="cardPreventCornerOverlap">true</item>
+    </style>
+    <style name="CardView.Dark">
+        <item name="cardBackgroundColor">@color/cardview_dark_background</item>
+    </style>
+    <style name="CardView.Light">
+        <item name="cardBackgroundColor">@color/cardview_light_background</item>
+    </style>
+    <!-- From: file:/C:/git/AlertBuddy/Application/src/main/res/values/themes.xml -->
+    <eat-comment/>
+    <style name="MyTheme" parent="android:Theme.Material.Light.DarkActionBar">
+        <item name="android:colorAccent">@color/accent</item>
+    </style>
+    <!-- From: file:/C:/git/AlertBuddy/Application/src/main/res/values/template-styles.xml -->
+    <eat-comment/>
+    <style name="Theme.Base" parent="android:Theme.Light"/>
+    <style name="Theme.Sample" parent="Theme.Base"/>
+    <style name="Widget"/>
+    <style name="Widget.SampleMessage">
+        <item name="android:textAppearance">?android:textAppearanceMedium</item>
+        <item name="android:lineSpacingMultiplier">1.1</item>
+    </style>
+    <style name="Widget.SampleMessageTile">
+        <item name="android:background">@drawable/tile</item>
+        <item name="android:shadowColor">#7F000000</item>
+        <item name="android:shadowDy">-3.5</item>
+        <item name="android:shadowRadius">2</item>
+    </style>
+    <!-- From: file:/C:/git/AlertBuddy/Application/src/main/res/values/themes.xml -->
+    <eat-comment/>
+    <style name="progress" parent="android:Theme.Dialog">
+        <item name="android:windowBackground">@color/transparent</item>
+        <item name="android:textColorPrimary">@color/red</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textAlignment">gravity</item>
+    </style>
+</resources>

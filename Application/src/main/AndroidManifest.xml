@@ -62,7 +62,12 @@
 
         <activity
             android:name=".DisplaySoundActivity"
-            android:label="@string/title_activity_display_sound" />
+            android:label="@string/title_activity_display_sound"
+            android:launchMode="singleTask">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".DisplaySoundActivity" />
+        </activity>
         <activity
             android:name=".SoundSettingsActivity"
             android:label="@string/title_activity_sound_settings" />

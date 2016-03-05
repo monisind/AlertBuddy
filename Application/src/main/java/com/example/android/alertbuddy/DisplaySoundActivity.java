@@ -163,6 +163,8 @@ public class DisplaySoundActivity extends Activity {
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "^^^^^*****^^^^^ received something");
+
             final String action = intent.getAction();
             if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                 mConnected = true;
@@ -179,7 +181,6 @@ public class DisplaySoundActivity extends Activity {
                 services = mBluetoothLeService.getSupportedGattServices();
                 getCharacteristics(services);
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
-                // ** changed //
                 onDataRecived(intent.getByteArrayExtra(BluetoothLeService.EXTRA_DATA));
             }
         }
@@ -286,7 +287,8 @@ public class DisplaySoundActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(mGattUpdateReceiver);
+        // changed: this thing stopped the receiver from getting any update
+        // unregisterReceiver(mGattUpdateReceiver);
     }
 
     @Override

@@ -188,13 +188,13 @@ public class DeviceControlActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(mGattUpdateReceiver);
+        //changed: unregisterReceiver(mGattUpdateReceiver);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unbindService(mServiceConnection);
+        changed: unbindService(mServiceConnection);
         mBluetoothLeService = null;
     }
 
@@ -218,7 +218,7 @@ public class DeviceControlActivity extends Activity {
                 mBluetoothLeService.connect(mDeviceAddress);
                 return true;
             case R.id.menu_disconnect:
-                mBluetoothLeService.disconnect();
+                // changed: mBluetoothLeService.disconnect();
                 return true;
             case android.R.id.home:
                 onBackPressed();

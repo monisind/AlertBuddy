@@ -16,8 +16,13 @@
 
 package com.example.android.alertbuddy;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.app.TaskStackBuilder;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
@@ -28,8 +33,10 @@ import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.os.Binder;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import java.util.List;
@@ -329,4 +336,151 @@ public class BluetoothLeService extends Service {
 
         return mBluetoothGatt.getServices();
     }
+
+    /**
+     *  Initialize notification on create
+     */
+    @Override
+    public void onCreate(){
+        super.onCreate();
+        Log.d(TAG, "^^^^^*****^^^^^ service created");
+        initNotification();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "^^^^^*****^^^^^ service destroyed");
+    }
+
+    /**
+     * start sticky is needed to keep bluetooth alive
+     */
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        startService(intent);
+
+        Log.d(TAG, "^^^^^*****^^^^^ start command");
+        Thread thread = new Thread(new BleThread(startId));
+        thread.start();
+        return START_STICKY;
+    }
+
+
+    /**
+     * Can implement method to stop service if needed
+     */
+    final class BleThread implements Runnable {
+        int service_id;
+        BleThread(int id) {
+            this.service_id = id;
+        }
+
+        @Override
+        public void run() {
+            if (false) {
+                stopSelf(service_id);
+            }
+        }
+    }
+
+    /**
+     * Notification
+     */
+
+    private static final int NOTIFICATION_ID = 1;
+    private Intent mIntent;
+    NotificationCompat.Builder mBuilder;
+
+    private void initNotification() {
+        // Use NotificationCompat.Builder to set up notification for the app
+        mBuilder = new NotificationCompat.Builder(this);
+        mBuilder.setAutoCancel(true);
+
+        // set up icon if we want later
+        mBuilder.setSmallIcon(R.drawable.ic_launcher);
+
+        // Intent activated when notification is clicked
+        // Now just go to display sound activity
+        mIntent = new Intent(this, DisplaySoundActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                this,
+                0,
+                mIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        mBuilder.setContentIntent(pendingIntent);
+
+        // Set up builder
+        mBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher));
+        mBuilder.setContentTitle("AlertBuddy");
+        mBuilder.setContentText("AlertBuddy initiated.");
+        // mBuilder.setVibrate(long[] pattern); // vibration pattern
+
+        // Put the finished builder to notificationManager
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+
+        Log.d(TAG, "^^^^^*****^^^^^ initialized notification");
+    }
+
+    /**
+     * This function will be used to update the notification as required. Note that this
+     * function must be called explicitly by the class that does the detection.
+     * The parameter value used to be the value (1, 2, 3, 4) that's be passed back by
+     * the board. Depending on how we want to integrate the Detection algorithm with this,
+     * this can be changed accordingly.
+     * @param value
+     */
+    protected void updateNotification(String value) {
+
+        // set up icon if we want later
+        mBuilder.setSmallIcon(R.drawable.ic_launcher);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                this,
+                0,
+                mIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        mBuilder.setContentIntent(pendingIntent);
+
+        // Set up builder
+        mBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher));
+        mBuilder.setContentTitle("Environment Alert!");
+        String alarmType;
+        if (value.contains("1")) alarmType = "Fire Alarm";
+        else if (value.contains("2")) alarmType = "Ambulance";
+        else if (value.contains("3")) alarmType = "Car Horn";
+        else if (value.contains("4")) alarmType = "Police";
+        else alarmType = value;
+        mBuilder.setContentText("Detected " + alarmType);
+
+        // This part is for heads-up notification
+        mBuilder.setDefaults(Notification.DEFAULT_VIBRATE);
+        mBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher));
+        mBuilder.setPriority(Notification.PRIORITY_HIGH);
+        // mBuilder.setVibrate(long[] pattern); // vibration pattern
+        lockScreenNotification();
+
+        // Put the finished builder to notificationManager
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+    }
+
+    private void lockScreenNotification() {
+        mBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
+        mBuilder.setAutoCancel(true);
+    }
+
+    /**
+     *  This method is not called now, but this can be used
+     *  to cancel the notification service.
+     */
+    private void cancelNotification(){
+        String ns = Context.NOTIFICATION_SERVICE;
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(ns);
+        mNotificationManager.cancel(NOTIFICATION_ID);
+    }
+
 }
