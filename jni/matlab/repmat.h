@@ -5,7 +5,7 @@
  * File: repmat.h
  *
  * MATLAB Coder version            : 2.8
- * C/C++ source code generated on  : 20-Feb-2016 01:28:22
+ * C/C++ source code generated on  : 01-Mar-2016 23:54:39
  */
 
 #ifndef __REPMAT_H__
@@ -21,7 +21,7 @@
 #include "neural_net_classify_types.h"
 
 /* Function Declarations */
-extern void b_repmat(double b[248]);
+extern void b_repmat(double b[372]);
 extern void repmat(double b[1240]);
 
 #endif

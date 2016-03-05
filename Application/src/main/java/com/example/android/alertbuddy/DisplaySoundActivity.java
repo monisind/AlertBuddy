@@ -71,6 +71,10 @@ public class DisplaySoundActivity extends Activity {
         mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
         btn_write = (Button) findViewById(R.id.btn_send);
         tx_msg = (EditText) findViewById(R.id.send_message);
+
+        tx_msg.setVisibility(View.GONE);
+        btn_write.setVisibility(View.GONE);
+
         rx_msg = (TextView) findViewById(R.id.res_message);
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
@@ -225,6 +229,7 @@ public class DisplaySoundActivity extends Activity {
         float classificationResult = detection.classify(mfccs);
         Log.d(TAG, "CLASSIFICATION " + classificationResult);
 
+        rx_msg.setText("" + (int)classificationResult);
         //saveMFCCs(mfccs);
     }
 
@@ -266,6 +271,15 @@ public class DisplaySoundActivity extends Activity {
         if (mBluetoothLeService != null) {
             final boolean result = mBluetoothLeService.connect(mDeviceAddress);
             Log.d(TAG, "Connect request result=" + result);
+            if(result) {
+                try {
+                    Thread.sleep(600L);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                sendClearToSend();
+            }
+
         }
     }
 
