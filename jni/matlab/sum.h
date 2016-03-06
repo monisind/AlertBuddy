@@ -5,7 +5,7 @@
  * File: sum.h
  *
  * MATLAB Coder version            : 2.8
- * C/C++ source code generated on  : 01-Mar-2016 23:54:39
+ * C/C++ source code generated on  : 05-Mar-2016 19:32:56
  */
 
 #ifndef __SUM_H__
@@ -21,7 +21,7 @@
 #include "neural_net_classify_types.h"
 
 /* Function Declarations */
-extern void sum(const float x[372], float y[3]);
+extern void sum(const float x[620], float y[5]);
 
 #endif
 

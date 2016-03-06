@@ -4,7 +4,13 @@
 
 #define MFCC_SIZE 13*124
 
-jint Java_com_example_android_alertbuddy_Detection_classify
+jstring Java_com_example_android_alertbuddy_DetectionService_helloworld
+        (JNIEnv* env, jobject obj)
+{
+    return (*env)->NewStringUTF(env, "Hello World");
+}
+
+jint Java_com_example_android_alertbuddy_DetectionService_classify
         (JNIEnv* env, jobject obj, jfloatArray mfccs)
 {
     int i,result;
