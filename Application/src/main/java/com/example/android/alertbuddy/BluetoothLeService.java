@@ -414,7 +414,6 @@ public class BluetoothLeService extends Service {
         mBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher));
         mBuilder.setContentTitle("AlertBuddy");
         mBuilder.setContentText("AlertBuddy initiated.");
-        // mBuilder.setVibrate(long[] pattern); // vibration pattern
 
         // Put the finished builder to notificationManager
         NotificationManager notificationManager =
@@ -459,7 +458,6 @@ public class BluetoothLeService extends Service {
         mBuilder.setDefaults(Notification.DEFAULT_VIBRATE);
         mBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher));
         mBuilder.setPriority(Notification.PRIORITY_HIGH);
-        // mBuilder.setVibrate(long[] pattern); // vibration pattern
         lockScreenNotification();
 
         // Put the finished builder to notificationManager

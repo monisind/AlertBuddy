@@ -11,8 +11,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,6 +30,7 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class DisplaySoundActivity extends Activity {
@@ -56,8 +59,8 @@ public class DisplaySoundActivity extends Activity {
     private final String LIST_NAME = "NAME";
     private final String LIST_UUID = "UUID";
 
-    private Button btn_write;
-    private EditText tx_msg;
+//    private Button btn_write;
+//    private EditText tx_msg;
     private TextView rx_msg;
 
 
@@ -69,48 +72,49 @@ public class DisplaySoundActivity extends Activity {
         final Intent intent = getIntent();
         mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
         mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
-        btn_write = (Button) findViewById(R.id.btn_send);
-        tx_msg = (EditText) findViewById(R.id.send_message);
+//        btn_write = (Button) findViewById(R.id.btn_send);
+//        tx_msg = (EditText) findViewById(R.id.send_message);
 
-        tx_msg.setVisibility(View.GONE);
-        btn_write.setVisibility(View.GONE);
+        //tx_msg.setVisibility(View.GONE);
+        //btn_write.setVisibility(View.GONE);
 
         rx_msg = (TextView) findViewById(R.id.res_message);
+        rx_msg.setText("Fire Alarm");
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
 
 
-        btn_write.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                writeMessage(tx_msg.getText().toString());
-            }
-        });
+//        btn_write.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                writeMessage(tx_msg.getText().toString());
+//            }
+//        });
     }
 
-    private void writeMessage(String msg){
-        if (target_character != null) {
-            Log.d(TAG, "send cmd:" + msg);
-            if (msg != null) {
-                byte[] tmp = msg.getBytes();
-                byte[] tx = new byte[tmp.length];
-                for (int i = 0; i < tmp.length; i++) {
-                    tx[i] = tmp[i];
-                }
-                target_character.setValue(tx);
-                mBluetoothLeService.writeCharacteristic(target_character);
-
-
-            } else {
-                Toast.makeText(DisplaySoundActivity.this, "Please type your command.", Toast.LENGTH_SHORT).show();
-            }
-        } else {
-            Toast.makeText(DisplaySoundActivity.this, "Please select a UUID.", Toast.LENGTH_SHORT).show();
-        }
-        tx_msg.setText(null);
-
-    }
+//    private void writeMessage(String msg){
+//        if (target_character != null) {
+//            Log.d(TAG, "send cmd:" + msg);
+//            if (msg != null) {
+//                byte[] tmp = msg.getBytes();
+//                byte[] tx = new byte[tmp.length];
+//                for (int i = 0; i < tmp.length; i++) {
+//                    tx[i] = tmp[i];
+//                }
+//                target_character.setValue(tx);
+//                mBluetoothLeService.writeCharacteristic(target_character);
+//
+//
+//            } else {
+//                Toast.makeText(DisplaySoundActivity.this, "Please type your command.", Toast.LENGTH_SHORT).show();
+//            }
+//        } else {
+//            Toast.makeText(DisplaySoundActivity.this, "Please select a UUID.", Toast.LENGTH_SHORT).show();
+//        }
+//        tx_msg.setText(null);
+//
+//    }
 
     private void getCharacteristics(List<BluetoothGattService> gattServices) {
         Boolean tx = false;
@@ -230,8 +234,21 @@ public class DisplaySoundActivity extends Activity {
         float classificationResult = detection.classify(mfccs);
         Log.d(TAG, "CLASSIFICATION " + classificationResult);
 
-        rx_msg.setText("" + (int)classificationResult);
+
         //saveMFCCs(mfccs);
+    }
+
+    private void displayDetectedSound(int classificationResult ){
+        SharedPreferences sharedPref = getSharedPreferences("SoundSettings", 0);
+        Map<String, ?> allEntries = sharedPref.getAll();
+        ArrayList<SoundModel> soundList = new ArrayList<SoundModel>();
+
+        for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
+            SoundModel model = new SoundModel(entry.getKey(), (Boolean)entry.getValue());
+            soundList.add(model);
+        }
+
+        rx_msg.setText("" + (int)classificationResult);
     }
 
     private void sendClearToSend()
@@ -324,9 +341,6 @@ public class DisplaySoundActivity extends Activity {
                 startActivityForResult(intent,REQUEST_CODE );
                // startActivity(intent);
                 return true;
-            case R.id.action_settings_vibration:
-                Log.i(TAG, "Menu item: " + item.getTitle());
-                return true;
             case R.id.action_settings_ble:
                 Log.i(TAG, "Menu item: " + item.getTitle());
                 return true;
@@ -342,7 +356,7 @@ public class DisplaySoundActivity extends Activity {
             case (REQUEST_CODE) : {
                 if (resultCode == Activity.RESULT_OK) {
                     String newSoundSettings = data.getStringExtra("soundSettings");
-                    writeMessage(newSoundSettings);
+//                    writeMessage(newSoundSettings);
                 }
                 break;
             }

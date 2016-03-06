@@ -50,14 +50,15 @@ public class DeviceScanActivity extends ListActivity {
     private final static String TAG = DeviceScanActivity.class.getSimpleName();
     private static final int REQUEST_ENABLE_BT = 1;
     // Stops scanning after 10 seconds.
-    private static final long SCAN_PERIOD = 20000;
+    private static final long SCAN_PERIOD = 10000;
 
 
     private LeDeviceListAdapter mLeDeviceListAdapter;
     private BluetoothAdapter mBluetoothAdapter;
     private boolean mScanning;
     private Handler mHandler;
-    private String filterDeviceName = "AlertBuddy";
+   // private String filterDeviceName = "AlertBuddy";
+    private String filterDeviceName = "BLE UART";
     private ProgressDialog progress;
 
 
