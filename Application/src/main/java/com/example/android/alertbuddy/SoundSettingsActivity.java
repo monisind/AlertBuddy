@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class SoundSettingsActivity extends Activity {
@@ -38,7 +40,7 @@ public class SoundSettingsActivity extends Activity {
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                CheckBox cb  = (CheckBox)view.findViewById(R.id.checkBox1);
+                CheckBox cb = (CheckBox) view.findViewById(R.id.checkBox1);
                 cb.performClick();
             }
         });
@@ -68,7 +70,7 @@ public class SoundSettingsActivity extends Activity {
     }
 
     public void storeSoundSettings(ArrayList<SoundModel> soundList){
-        SharedPreferences sharedPref = SoundSettingsActivity.this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = getSharedPreferences("SoundSettings", 0);
         SharedPreferences.Editor editor = sharedPref.edit();
 
         for (int i = 0; i < soundList.size(); i++) {
@@ -78,8 +80,8 @@ public class SoundSettingsActivity extends Activity {
         editor.commit();
     }
 
-    public ArrayList<SoundModel> readSoundSettings(){
-        SharedPreferences sharedPref = SoundSettingsActivity.this.getPreferences(Context.MODE_PRIVATE);
+    public ArrayList<SoundModel> readSoundSettings() {
+        SharedPreferences sharedPref = getSharedPreferences("SoundSettings", 0);
         Map<String, ?> allEntries = sharedPref.getAll();
         ArrayList<SoundModel> soundList = new ArrayList<SoundModel>();
 
@@ -89,16 +91,15 @@ public class SoundSettingsActivity extends Activity {
         }
 
         if(soundList.size() == 0){
-            SoundModel model = new SoundModel("Ambulance",false);
-            soundList.add(model);
-            model = new SoundModel("Fire Alarm", false);
-            soundList.add(model);
-            model = new SoundModel("Police", false);
-            soundList.add(model);
-            model = new SoundModel("car horn", false);
-            soundList.add(model);
+            HashMap<String, Integer> soundTypes = SoundModel.getSoundTypes();
+
+            for (Map.Entry<String, ?> sound : soundTypes.entrySet()) {
+                SoundModel model = new SoundModel(sound.getKey(),false);
+                soundList.add(model);
+            }
         }
 
         return soundList;
     }
+
 }
