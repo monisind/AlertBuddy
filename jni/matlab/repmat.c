@@ -5,7 +5,7 @@
  * File: repmat.c
  *
  * MATLAB Coder version            : 2.8
- * C/C++ source code generated on  : 01-Mar-2016 23:54:39
+ * C/C++ source code generated on  : 05-Mar-2016 19:32:56
  */
 
 /* Include Files */
@@ -16,20 +16,20 @@
 /* Function Definitions */
 
 /*
- * Arguments    : double b[372]
+ * Arguments    : double b[620]
  * Return Type  : void
  */
-void b_repmat(double b[372])
+void b_repmat(double b[620])
 {
   int jtilecol;
   int ibtile;
   int k;
-  static const double a[3] = { 0.0062086285430117683, 0.616227257079201,
-    -0.47945560382638786 };
+  static const double a[5] = { -0.33556913576082842, -0.42759181966372672,
+    -0.68505148118922221, -0.68944135564891251, 0.92622599739482236 };
 
   for (jtilecol = 0; jtilecol < 124; jtilecol++) {
-    ibtile = jtilecol * 3;
-    for (k = 0; k < 3; k++) {
+    ibtile = jtilecol * 5;
+    for (k = 0; k < 5; k++) {
       b[ibtile + k] = a[k];
     }
   }
@@ -43,10 +43,10 @@ void repmat(double b[1240])
 {
   int jtilecol;
   int ibtile;
-  static const double a[10] = { 1.5717055083484806, -0.60994418067648193,
-    -0.23935031870344742, 0.259870738679722, -0.20174450977834582,
-    -0.36538336605058053, 0.75226175113390292, -1.4075691545321862,
-    -1.2215713653855522, 1.5856356671327707 };
+  static const double a[10] = { 1.169339354075815, -0.2508937812000846,
+    -0.25575833578900353, -0.29881274057374385, -0.66315863474369574,
+    -1.0046802645061315, 0.66905495894511169, -1.212623176813642,
+    -0.076237432475232514, 1.9287549778918 };
 
   for (jtilecol = 0; jtilecol < 124; jtilecol++) {
     ibtile = jtilecol * 10;
