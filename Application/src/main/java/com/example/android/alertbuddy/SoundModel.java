@@ -11,18 +11,27 @@ public class SoundModel {
 
     private String name = null;
     private boolean selected = false;
-    private int code;
+    public static final String INVALID_SOUND = "Other";
+    public static HashMap<Integer,String> soundTypes = new HashMap<Integer,String>(){
+        {
+            put(1, "Ambulance");
+            put(2, "Car Horn");
+            put(3, "Fire Alarm");
+            put(4, "Police");
 
+        };
+
+    };
 
     public SoundModel(String name, boolean selected) {
         this.name = name;
         this.selected = selected;
-        this.code = getCodeForSound(name);
     }
 
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -35,25 +44,13 @@ public class SoundModel {
         this.selected = selected;
     }
 
-    public int getCode(){
-        return code;
-    }
 
-    public void setCode(int code){
-        this.code = code;
-    }
-
-    public static HashMap<String,Integer> getSoundTypes(){
-        HashMap<String,Integer> soundTypes = new HashMap<String, Integer>();
-        soundTypes.put("Ambulance", 1);
-        soundTypes.put("Car Horn", 2);
-        soundTypes.put("Fire Alarm", 3);
-        soundTypes.put("Police", 4);
-        return soundTypes;
-    }
-
-    public static int getCodeForSound(String sound){
-        return getSoundTypes().get(sound);
+    public static String getSoundForCode(int code){
+        HashMap<Integer,String> soundTypes = new HashMap<Integer,String>();
+        if(soundTypes.containsKey(code)){
+            return soundTypes.get(code);
+        }
+        return INVALID_SOUND;
     }
 
 }

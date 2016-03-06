@@ -40,6 +40,7 @@ public class DisplaySoundActivity extends Activity {
 
     public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
     public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
+    public static final String DEFAULT_TEXT = "Alert Buddy";
 
     public final static UUID UART_UUID = UUID.fromString(SampleGattAttributes.UART_SERVICE);
     public final static UUID TX_UUID = UUID.fromString(SampleGattAttributes.TX_CHARACTERISTIC);
@@ -79,7 +80,7 @@ public class DisplaySoundActivity extends Activity {
         //btn_write.setVisibility(View.GONE);
 
         rx_msg = (TextView) findViewById(R.id.res_message);
-        rx_msg.setText("Fire Alarm");
+        rx_msg.setText(DEFAULT_TEXT);
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
@@ -234,21 +235,23 @@ public class DisplaySoundActivity extends Activity {
         float classificationResult = detection.classify(mfccs);
         Log.d(TAG, "CLASSIFICATION " + classificationResult);
 
-
+        displayDetectedSound((int)classificationResult);
         //saveMFCCs(mfccs);
     }
 
     private void displayDetectedSound(int classificationResult ){
+
         SharedPreferences sharedPref = getSharedPreferences("SoundSettings", 0);
         Map<String, ?> allEntries = sharedPref.getAll();
-        ArrayList<SoundModel> soundList = new ArrayList<SoundModel>();
 
-        for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
-            SoundModel model = new SoundModel(entry.getKey(), (Boolean)entry.getValue());
-            soundList.add(model);
+        String sound = SoundModel.getSoundForCode(classificationResult);
+
+        if(!sound.equals("Other") && (Boolean)allEntries.get(sound)){
+            rx_msg.setText(sound);
+            sendNotificationToPeripheral(sound);
+        }else{
+            rx_msg.setText(DEFAULT_TEXT);
         }
-
-        rx_msg.setText("" + (int)classificationResult);
     }
 
     private void sendClearToSend()
@@ -412,6 +415,24 @@ public class DisplaySoundActivity extends Activity {
 //
 //
 //    }
+
+    public void sendNotificationToPeripheral(String soundDetected){
+        if (target_character != null) {
+            if (soundDetected != null) {
+                byte[] tmp = soundDetected.getBytes();
+                byte[] tx = new byte[tmp.length];
+                for (int i = 0; i < tmp.length; i++) {
+                    tx[i] = tmp[i];
+                }
+                target_character.setValue(tx);
+                mBluetoothLeService.writeCharacteristic(target_character);
+
+
+            }
+        } else {
+            Toast.makeText(DisplaySoundActivity.this, "Please select a UUID.", Toast.LENGTH_SHORT).show();
+        }
+    }
 }
 
 

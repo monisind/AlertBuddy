@@ -91,10 +91,10 @@ public class SoundSettingsActivity extends Activity {
         }
 
         if(soundList.size() == 0){
-            HashMap<String, Integer> soundTypes = SoundModel.getSoundTypes();
+            HashMap<Integer, String> soundTypes = SoundModel.soundTypes;
 
-            for (Map.Entry<String, ?> sound : soundTypes.entrySet()) {
-                SoundModel model = new SoundModel(sound.getKey(),false);
+            for (Map.Entry<Integer, String> sound : soundTypes.entrySet()) {
+                SoundModel model = new SoundModel(sound.getValue(),false);
                 soundList.add(model);
             }
         }
