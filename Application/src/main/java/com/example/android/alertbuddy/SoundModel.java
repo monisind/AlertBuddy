@@ -48,7 +48,7 @@ public class SoundModel {
         soundTypes.put("Ambulance", 1);
         soundTypes.put("Car Horn", 2);
         soundTypes.put("Fire Alarm", 3);
-        soundTypes.put("Police", 4);
+        soundTypes.put("Police", 5);
         return soundTypes;
     }
 

@@ -79,7 +79,7 @@ public class DisplaySoundActivity extends Activity {
         //btn_write.setVisibility(View.GONE);
 
         rx_msg = (TextView) findViewById(R.id.res_message);
-        rx_msg.setText("Fire Alarm");
+        //rx_msg.setText("Fire Alarm");
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
@@ -232,6 +232,7 @@ public class DisplaySoundActivity extends Activity {
         float classificationResult = detection.classify(mfccs);
         Log.d(TAG, "CLASSIFICATION " + classificationResult);
 
+        displayDetectedSound((int)classificationResult);
 
         //saveMFCCs(mfccs);
     }
