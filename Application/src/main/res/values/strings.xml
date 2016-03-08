@@ -38,7 +38,7 @@
 
     <string name="action_settings">Settings</string>
     <string name="action_settings_sound">Sound Settings</string>
-    <string name="action_settings_ble">BLE</string>
+    <string name="action_settings_ble">Device Settings</string>
 
     <string name="title_activity_display_sound">Main</string>
 

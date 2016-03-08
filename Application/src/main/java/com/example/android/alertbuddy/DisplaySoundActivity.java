@@ -340,12 +340,13 @@ public class DisplaySoundActivity extends Activity {
                 return true;
             case R.id.action_settings_sound:
                 Log.i(TAG, "Menu item: " + item.getTitle());
-                Intent intent = new Intent(this, SoundSettingsActivity.class);
-                startActivityForResult(intent,REQUEST_CODE );
-               // startActivity(intent);
+                Intent sound_intent = new Intent(this, SoundSettingsActivity.class);
+                startActivityForResult(sound_intent,REQUEST_CODE );
                 return true;
             case R.id.action_settings_ble:
                 Log.i(TAG, "Menu item: " + item.getTitle());
+                Intent ble_intent = new Intent(this, BLESettingsActivity.class);
+                startActivity(ble_intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
