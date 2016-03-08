@@ -33,7 +33,7 @@ public class BLESettingsActivity extends ListActivity {
     private static final String FILTER_DEVICE_NAME = "BLE UART";
 
     // Stops scanning after 20 seconds.
-    private static final long SCAN_PERIOD = 20000;
+    private static final long SCAN_PERIOD = 5000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
