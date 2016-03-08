@@ -17,7 +17,7 @@ public class SoundModel {
             put(1, "Ambulance");
             put(2, "Car Horn");
             put(3, "Fire Alarm");
-            put(4, "Police");
+            put(5, "Police");
 
         };
 
@@ -43,10 +43,7 @@ public class SoundModel {
     public void setSelected(boolean selected) {
         this.selected = selected;
     }
-
-
     public static String getSoundForCode(int code){
-        HashMap<Integer,String> soundTypes = new HashMap<Integer,String>();
         if(soundTypes.containsKey(code)){
             return soundTypes.get(code);
         }

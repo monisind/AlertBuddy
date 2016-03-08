@@ -80,7 +80,9 @@ public class DisplaySoundActivity extends Activity {
         //btn_write.setVisibility(View.GONE);
 
         rx_msg = (TextView) findViewById(R.id.res_message);
+
         rx_msg.setText(DEFAULT_TEXT);
+
 
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
@@ -168,8 +170,6 @@ public class DisplaySoundActivity extends Activity {
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "^^^^^*****^^^^^ received something");
-
             final String action = intent.getAction();
             if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                 mConnected = true;
@@ -236,6 +236,7 @@ public class DisplaySoundActivity extends Activity {
         Log.d(TAG, "CLASSIFICATION " + classificationResult);
 
         displayDetectedSound((int)classificationResult);
+
         //saveMFCCs(mfccs);
     }
 
