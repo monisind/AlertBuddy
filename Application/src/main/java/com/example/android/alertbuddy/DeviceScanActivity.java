@@ -58,7 +58,7 @@ public class DeviceScanActivity extends ListActivity {
     private boolean mScanning;
     private Handler mHandler;
    // private String filterDeviceName = "AlertBuddy";
-    private String filterDeviceName = "BLE UART";
+    private static final String FILTER_DEVICE_NAME = "BLE UART";
     private ProgressDialog progress;
 
 
@@ -293,7 +293,7 @@ public class DeviceScanActivity extends ListActivity {
                         //show a list of device
                         // Filter by device name: "BLE UART"
                         String scannedDeviceName  = device.getName();
-                        if(scannedDeviceName!=null && scannedDeviceName.equals(filterDeviceName)){
+                        if(scannedDeviceName!=null && scannedDeviceName.equals(FILTER_DEVICE_NAME)){
                             mLeDeviceListAdapter.addDevice(device);
                             mLeDeviceListAdapter.notifyDataSetChanged();
                         }
