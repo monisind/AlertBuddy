@@ -5,6 +5,7 @@ import android.app.ListActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
+import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,15 +16,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
-public class BLESettingsActivity extends ListActivity {
+public class BLESettingsActivity extends Activity {
     private BluetoothAdapter mBluetoothAdapter;
     private final static String TAG = BLESettingsActivity.class.getSimpleName();
     private Handler mHandler;
@@ -31,6 +35,7 @@ public class BLESettingsActivity extends ListActivity {
     private LeDeviceListAdapter mLeDeviceListAdapter;
     private static final int REQUEST_ENABLE_BT = 1;
     private static final String FILTER_DEVICE_NAME = "BLE UART";
+    private ListView listView;
 
     // Stops scanning after 20 seconds.
     private static final long SCAN_PERIOD = 5000;
@@ -38,8 +43,7 @@ public class BLESettingsActivity extends ListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_ble_settings);
-
+        setContentView(R.layout.activity_ble_settings);
         mHandler = new Handler();
 
         // Initializes a Bluetooth adapter.  For API level 18 and above, get a reference to
@@ -47,7 +51,20 @@ public class BLESettingsActivity extends ListActivity {
         final BluetoothManager bluetoothManager =
                 (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = bluetoothManager.getAdapter();
+        listView = (ListView) findViewById(R.id.bleList);
+        displayConnectedDevice(bluetoothManager);
+    }
 
+    public void displayConnectedDevice(BluetoothManager bluetoothManager){
+        List<BluetoothDevice> devices = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT);
+        for(BluetoothDevice device : devices){
+            if(device.getName().equals(FILTER_DEVICE_NAME )){
+                TextView name = (TextView)findViewById(R.id.connected_device_name);
+                name.setText(device.getName());
+                TextView address = (TextView)findViewById(R.id.connected_device_address);
+                address.setText(device.getAddress());
+            }
+        }
     }
 
     @Override
@@ -95,8 +112,19 @@ public class BLESettingsActivity extends ListActivity {
 
         // Initializes list view adapter.
         mLeDeviceListAdapter = new LeDeviceListAdapter();
-        setListAdapter(mLeDeviceListAdapter);
+//        setListAdapter(mLeDeviceListAdapter);
+
+
+        listView.setAdapter(mLeDeviceListAdapter);
         scanLeDevice(true);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                final BluetoothDevice device = mLeDeviceListAdapter.getDevice(position);
+                if (device == null) return;
+                selectDevice(device);
+            }
+        });
     }
 
     @Override
@@ -158,13 +186,13 @@ public class BLESettingsActivity extends ListActivity {
                 }
             };
 
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
-        final BluetoothDevice device = mLeDeviceListAdapter.getDevice(position);
-        if (device == null) return;
-        selectDevice(device);
-
-    }
+//    @Override
+//    protected void onListItemClick(ListView l, View v, int position, long id) {
+//        final BluetoothDevice device = mLeDeviceListAdapter.getDevice(position);
+//        if (device == null) return;
+//        selectDevice(device);
+//
+//    }
 
     private void selectDevice(BluetoothDevice device){
         final Intent intent = new Intent(this, DisplaySoundActivity.class);
