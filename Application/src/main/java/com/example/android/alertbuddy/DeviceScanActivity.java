@@ -58,7 +58,7 @@ public class DeviceScanActivity extends ListActivity {
     private boolean mScanning;
     private Handler mHandler;
    // private String filterDeviceName = "AlertBuddy";
-    private static final String FILTER_DEVICE_NAME = "BLE UART";
+    private static final String FILTER_DEVICE_NAME = "Alert Buddy";
     private ProgressDialog progress;
 
 

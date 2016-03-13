@@ -248,7 +248,8 @@ public class DisplaySoundActivity extends Activity {
         String sound = SoundModel.getSoundForCode(classificationResult);
 
         if(!sound.equals("Other") && (Boolean)allEntries.get(sound)){
-            rx_msg.setText("Detected : " + sound);
+            rx_msg.setText("Detected " + sound);
+            mBluetoothLeService.updateNotification("Detected " + sound);
             sendNotificationToPeripheral(sound);
         }else{
             rx_msg.setText(DEFAULT_TEXT);
