@@ -5,7 +5,7 @@
  * File: neural_net_classify.c
  *
  * MATLAB Coder version            : 2.8
- * C/C++ source code generated on  : 05-Mar-2016 19:32:56
+ * C/C++ source code generated on  : 13-Mar-2016 23:47:35
  */
 
 /* Include Files */
@@ -28,9 +28,9 @@ double neural_net_classify(const float MFCCs[1612])
   float b_MFCCs[1488];
   int ixstart;
   int itmp;
-  float result[620];
-  float b_result[620];
-  float k[5];
+  float result[372];
+  float b_result[372];
+  float k[3];
   float mtmp;
   int ix;
   boolean_T exitg1;
@@ -44,9 +44,9 @@ double neural_net_classify(const float MFCCs[1612])
   }
 
   neural_net(b_MFCCs, result);
-  for (ixstart = 0; ixstart < 5; ixstart++) {
+  for (ixstart = 0; ixstart < 3; ixstart++) {
     for (itmp = 0; itmp < 124; itmp++) {
-      b_result[itmp + 124 * ixstart] = result[ixstart + 5 * itmp];
+      b_result[itmp + 124 * ixstart] = result[ixstart + 3 * itmp];
     }
   }
 
@@ -57,7 +57,7 @@ double neural_net_classify(const float MFCCs[1612])
   if (rtIsNaNF(k[0])) {
     ix = 2;
     exitg1 = false;
-    while ((!exitg1) && (ix < 6)) {
+    while ((!exitg1) && (ix < 4)) {
       ixstart = ix;
       if (!rtIsNaNF(k[ix - 1])) {
         mtmp = k[ix - 1];
@@ -69,8 +69,8 @@ double neural_net_classify(const float MFCCs[1612])
     }
   }
 
-  if (ixstart < 5) {
-    while (ixstart + 1 < 6) {
+  if (ixstart < 3) {
+    while (ixstart + 1 < 4) {
       if (k[ixstart] > mtmp) {
         mtmp = k[ixstart];
         itmp = ixstart + 1;

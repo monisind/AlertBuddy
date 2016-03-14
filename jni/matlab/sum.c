@@ -5,7 +5,7 @@
  * File: sum.c
  *
  * MATLAB Coder version            : 2.8
- * C/C++ source code generated on  : 05-Mar-2016 19:32:56
+ * C/C++ source code generated on  : 13-Mar-2016 23:47:35
  */
 
 /* Include Files */
@@ -16,11 +16,11 @@
 /* Function Definitions */
 
 /*
- * Arguments    : const float x[620]
- *                float y[5]
+ * Arguments    : const float x[372]
+ *                float y[3]
  * Return Type  : void
  */
-void sum(const float x[620], float y[5])
+void sum(const float x[372], float y[3])
 {
   int ix;
   int iy;
@@ -29,7 +29,7 @@ void sum(const float x[620], float y[5])
   float s;
   ix = -1;
   iy = -1;
-  for (i = 0; i < 5; i++) {
+  for (i = 0; i < 3; i++) {
     ixstart = ix + 1;
     ix++;
     s = x[ixstart];
