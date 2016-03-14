@@ -14,10 +14,10 @@ public class SoundModel {
     public static final String INVALID_SOUND = "Other";
     public static HashMap<Integer,String> soundTypes = new HashMap<Integer,String>(){
         {
-            put(1, "Ambulance");
+            put(1, "Ambulance Siren");
             put(2, "Car Horn");
             put(3, "Fire Alarm");
-            put(5, "Police");
+            put(5, "Police Siren");
 
         };
 

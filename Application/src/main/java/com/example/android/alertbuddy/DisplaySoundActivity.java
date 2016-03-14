@@ -40,7 +40,7 @@ public class DisplaySoundActivity extends Activity {
 
     public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
     public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
-    public static final String DEFAULT_TEXT = "Alert Buddy";
+    public static final String DEFAULT_TEXT = "No Alarm Detected";
 
     public final static UUID UART_UUID = UUID.fromString(SampleGattAttributes.UART_SERVICE);
     public final static UUID TX_UUID = UUID.fromString(SampleGattAttributes.TX_CHARACTERISTIC);
@@ -248,7 +248,8 @@ public class DisplaySoundActivity extends Activity {
         String sound = SoundModel.getSoundForCode(classificationResult);
 
         if(!sound.equals("Other") && (Boolean)allEntries.get(sound)){
-            rx_msg.setText(sound);
+            rx_msg.setText("Detected " + sound);
+            mBluetoothLeService.updateNotification("Detected " + sound);
             sendNotificationToPeripheral(sound);
         }else{
             rx_msg.setText(DEFAULT_TEXT);
@@ -341,12 +342,13 @@ public class DisplaySoundActivity extends Activity {
                 return true;
             case R.id.action_settings_sound:
                 Log.i(TAG, "Menu item: " + item.getTitle());
-                Intent intent = new Intent(this, SoundSettingsActivity.class);
-                startActivityForResult(intent,REQUEST_CODE );
-               // startActivity(intent);
+                Intent sound_intent = new Intent(this, SoundSettingsActivity.class);
+                startActivityForResult(sound_intent,REQUEST_CODE );
                 return true;
             case R.id.action_settings_ble:
                 Log.i(TAG, "Menu item: " + item.getTitle());
+                Intent ble_intent = new Intent(this, BLESettingsActivity.class);
+                startActivity(ble_intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

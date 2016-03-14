@@ -446,13 +446,8 @@ public class BluetoothLeService extends Service {
         // Set up builder
         mBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher));
         mBuilder.setContentTitle("Environment Alert!");
-        String alarmType;
-        if (value.contains("1")) alarmType = "Fire Alarm";
-        else if (value.contains("2")) alarmType = "Ambulance";
-        else if (value.contains("3")) alarmType = "Car Horn";
-        else if (value.contains("4")) alarmType = "Police";
-        else alarmType = value;
-        mBuilder.setContentText("Detected " + alarmType);
+
+        mBuilder.setContentText(value);
 
         // This part is for heads-up notification
         mBuilder.setDefaults(Notification.DEFAULT_VIBRATE);

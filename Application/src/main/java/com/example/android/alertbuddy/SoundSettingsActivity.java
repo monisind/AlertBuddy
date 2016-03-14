@@ -94,7 +94,7 @@ public class SoundSettingsActivity extends Activity {
             HashMap<Integer, String> soundTypes = SoundModel.soundTypes;
 
             for (Map.Entry<Integer, String> sound : soundTypes.entrySet()) {
-                SoundModel model = new SoundModel(sound.getValue(),false);
+                SoundModel model = new SoundModel(sound.getValue(),true);
                 soundList.add(model);
             }
         }

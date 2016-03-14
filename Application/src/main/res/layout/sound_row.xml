@@ -4,21 +4,21 @@
     android:layout_height="match_parent"
     android:orientation="horizontal" >
 
-    <CheckBox
-        android:id="@+id/checkBox1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingRight="20dp"
-        android:layout_alignParentLeft="true"
-        android:focusable="false"
-        android:focusableInTouchMode="false"
-        android:text="" />
+
     <TextView
         android:id="@+id/code"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/checkBox1"
-        android:layout_alignBottom="@+id/checkBox1"
-        android:layout_toRightOf="@+id/checkBox1" />
+        android:textAlignment="textEnd"/>
+    <CheckBox
+        android:id="@+id/checkBox1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:paddingLeft="25dp"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:textSize="18dp"
+        android:text="" />
 
 </LinearLayout>
