@@ -34,7 +34,6 @@ public class BLESettingsActivity extends Activity {
     private boolean mScanning;
     private LeDeviceListAdapter mLeDeviceListAdapter;
     private static final int REQUEST_ENABLE_BT = 1;
-    private static final String FILTER_DEVICE_NAME = "BLE UART";
     private ListView listView;
 
     // Stops scanning after 20 seconds.
@@ -58,7 +57,7 @@ public class BLESettingsActivity extends Activity {
     public void displayConnectedDevice(BluetoothManager bluetoothManager){
         List<BluetoothDevice> devices = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT);
         for(BluetoothDevice device : devices){
-            if(device.getName().equals(FILTER_DEVICE_NAME )){
+            if(device.getName().equals(DeviceScanActivity.FILTER_DEVICE_NAME )){
                 TextView name = (TextView)findViewById(R.id.connected_device_name);
                 name.setText(device.getName());
                 TextView address = (TextView)findViewById(R.id.connected_device_address);

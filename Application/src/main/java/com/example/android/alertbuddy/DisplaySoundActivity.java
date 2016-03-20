@@ -13,6 +13,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -28,10 +29,12 @@ import android.widget.Toast;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DisplaySoundActivity extends Activity {
 
@@ -64,6 +67,7 @@ public class DisplaySoundActivity extends Activity {
 //    private EditText tx_msg;
     private TextView rx_msg;
 
+    private int sensitivity = SensitivitySettingsActivity.DEFAULT_SENSITIVITY;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,52 +77,15 @@ public class DisplaySoundActivity extends Activity {
         final Intent intent = getIntent();
         mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
         mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
-//        btn_write = (Button) findViewById(R.id.btn_send);
-//        tx_msg = (EditText) findViewById(R.id.send_message);
-
-        //tx_msg.setVisibility(View.GONE);
-        //btn_write.setVisibility(View.GONE);
 
         rx_msg = (TextView) findViewById(R.id.res_message);
 
         rx_msg.setText(DEFAULT_TEXT);
 
-
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
 
-
-//        btn_write.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                writeMessage(tx_msg.getText().toString());
-//            }
-//        });
     }
-
-//    private void writeMessage(String msg){
-//        if (target_character != null) {
-//            Log.d(TAG, "send cmd:" + msg);
-//            if (msg != null) {
-//                byte[] tmp = msg.getBytes();
-//                byte[] tx = new byte[tmp.length];
-//                for (int i = 0; i < tmp.length; i++) {
-//                    tx[i] = tmp[i];
-//                }
-//                target_character.setValue(tx);
-//                mBluetoothLeService.writeCharacteristic(target_character);
-//
-//
-//            } else {
-//                Toast.makeText(DisplaySoundActivity.this, "Please type your command.", Toast.LENGTH_SHORT).show();
-//            }
-//        } else {
-//            Toast.makeText(DisplaySoundActivity.this, "Please select a UUID.", Toast.LENGTH_SHORT).show();
-//        }
-//        tx_msg.setText(null);
-//
-//    }
-
     private void getCharacteristics(List<BluetoothGattService> gattServices) {
         Boolean tx = false;
         Boolean rx = false;
@@ -131,8 +98,16 @@ public class DisplaySoundActivity extends Activity {
             if(gattService.getUuid().equals(UART_UUID) ){
                 gattCharacteristics =  gattService.getCharacteristics();
                 for(BluetoothGattCharacteristic gattCharacteristic: gattCharacteristics){
-                    if(gattCharacteristic.getUuid().equals(TX_UUID)){
+                    if(gattCharacteristic.getUuid().equals(TX_UUID)) {
                         target_character = gattCharacteristic;
+                        //Sleep a bit
+                        try {
+                            Thread.sleep(200);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        sendCurrentTime();
+                        sendClearToSend();
                     }
                 }
 
@@ -193,6 +168,32 @@ public class DisplaySoundActivity extends Activity {
 
 
     private ArrayList<Float> dataValues = new ArrayList<Float>();
+    private static int DATA_WATCHDOG_PERIOD = 5000;
+    private int receivedMfccDataCount = 0;
+
+    private Runnable dataWatchdogRunnable = new Runnable() {
+
+        private int watchDogMfccCount = 0;
+        @Override
+        public void run() {
+            //Log.d(TAG, "Data watchdog triggered.");
+
+            if(mBluetoothLeService != null && target_character != null)
+            {
+                if(watchDogMfccCount == receivedMfccDataCount)
+                {
+                    Log.d(TAG, "Data watchdog requesting data.");
+                    sendClearToSend();
+                }
+                else
+                {
+                    watchDogMfccCount = receivedMfccDataCount;
+                }
+
+            }
+        }
+    };
+
     private void onDataRecived(byte[] data)
     {
         if(data.length == 4 && data[0] == (byte)0xDE && data[1] == (byte)0xAD && data[2] == (byte)0xBE && data[3] == (byte)0xEF) {
@@ -211,6 +212,7 @@ public class DisplaySoundActivity extends Activity {
 
         if(dataValues.size() == Detection.MFCC_SIZE)
         {
+            receivedMfccDataCount ++;
             String txt = "";
             for(float val: dataValues)
             {
@@ -226,7 +228,13 @@ public class DisplaySoundActivity extends Activity {
             runDetection(vals);
             dataValues.clear();
             sendClearToSend();
+            if(mBluetoothLeService != null)
+            {
+                Handler dataWatchdog = mBluetoothLeService.getDataTimeoutWatchdog();
+                dataWatchdog.postDelayed(dataWatchdogRunnable, DATA_WATCHDOG_PERIOD);
+            }
         }
+
     }
 
 
@@ -240,31 +248,77 @@ public class DisplaySoundActivity extends Activity {
         //saveMFCCs(mfccs);
     }
 
-    private void displayDetectedSound(int classificationResult ){
 
-        SharedPreferences sharedPref = getSharedPreferences("SoundSettings", 0);
-        Map<String, ?> allEntries = sharedPref.getAll();
+    private int confidence = 0;
+    private int lastDetected = 0;
+    private void displayDetectedSound(int classificationResult )
+    {
+        Log.d(TAG, "Senstivity: " + sensitivity)
+;        SharedPreferences sensitivitySharedPref = getSharedPreferences("SensitivitySettings", 0);
 
-        String sound = SoundModel.getSoundForCode(classificationResult);
-
-        if(!sound.equals("Other") && (Boolean)allEntries.get(sound)){
-            rx_msg.setText("Detected " + sound);
-            mBluetoothLeService.updateNotification("Detected " + sound);
-            sendNotificationToPeripheral(sound);
-        }else{
-            rx_msg.setText(DEFAULT_TEXT);
+        if(sensitivitySharedPref.contains(SensitivitySettingsActivity.SENSITIVITY_SETTING_STRING))
+        {
+            int curSensitivity = sensitivitySharedPref.getInt(SensitivitySettingsActivity.SENSITIVITY_SETTING_STRING,
+                    SensitivitySettingsActivity.DEFAULT_SENSITIVITY);
+            if(sensitivity != curSensitivity)
+            {
+                sensitivity = curSensitivity;
+                confidence = 0;
+            }
         }
+
+        if(classificationResult == lastDetected)
+        {
+            confidence ++;
+            if(confidence > sensitivity)
+            {
+                confidence = sensitivity;
+            }
+        }
+        else
+        {
+            confidence --;
+            if(confidence < -1*sensitivity)
+            {
+                confidence = 0;
+            }
+        }
+
+        Log.d(TAG, "Sensitivity: " + sensitivity);
+        if(confidence >= sensitivity) {
+            SharedPreferences sharedPref = getSharedPreferences("SoundSettings", 0);
+            Map<String, ?> allEntries = sharedPref.getAll();
+
+            String sound = SoundModel.getSoundForCode(classificationResult);
+
+            if (!sound.equals("Other") && (Boolean) allEntries.get(sound)) {
+                rx_msg.setText("Detected " + sound);
+                mBluetoothLeService.updateNotification("Detected " + sound);
+                sendNotificationToPeripheral(sound);
+            } else {
+                rx_msg.setText(DEFAULT_TEXT);
+            }
+        }
+        lastDetected = classificationResult;
+    }
+
+    private boolean sendData(byte[] data)
+    {
+        if(target_character != null)
+        {
+            target_character.setValue(data);
+            return mBluetoothLeService.writeCharacteristic(target_character);
+        }
+        return false;
     }
 
     private void sendClearToSend()
     {
         byte[] cts_delim = {(byte)'1',(byte)'2', (byte)'3', (byte)'4'};
         if (target_character != null) {
-
-            target_character.setValue(cts_delim);
             boolean result = false;
             do {
-                result = mBluetoothLeService.writeCharacteristic(target_character);
+                result = sendData(cts_delim);
             }
             while(!result);
             if(result) {
@@ -278,6 +332,26 @@ public class DisplaySoundActivity extends Activity {
             Log.d(TAG, "Failed to send CTS");
         }
     }
+
+    private void sendCurrentTime()
+    {
+        Calendar rightNow = Calendar.getInstance();
+        int hour = rightNow.get(Calendar.HOUR_OF_DAY);
+        int min = rightNow.get(Calendar.MINUTE);
+        int sec = rightNow.get(Calendar.SECOND);
+
+        byte[] time_date = {(byte)'T',(byte)'I',(byte)'M', (byte)'E',(byte)hour,(byte)min, (byte)sec};
+        boolean result = sendData(time_date);
+        if(result)
+        {
+            Log.d(TAG, "Sent TIME " + hour + ":" + min + ":" + sec);
+        }
+        else
+        {
+            Log.d(TAG, "Failed to send TIME");
+        }
+    }
+
 //    private void displayData(byte[] data) {
 //        if (data != null) {
 //            String dataArray = new String(data);

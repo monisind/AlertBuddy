@@ -5,7 +5,7 @@
  * File: neural_net_classify_initialize.h
  *
  * MATLAB Coder version            : 2.8
- * C/C++ source code generated on  : 13-Mar-2016 23:47:35
+ * C/C++ source code generated on  : 18-Mar-2016 18:15:07
  */
 
 #ifndef __NEURAL_NET_CLASSIFY_INITIALIZE_H__

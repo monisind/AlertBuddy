@@ -35,6 +35,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -77,6 +78,13 @@ public class BluetoothLeService extends Service {
     public final static UUID TX_UUID = UUID.fromString(SampleGattAttributes.TX_CHARACTERISTIC);
     public final static UUID RX_UUID = UUID.fromString(SampleGattAttributes.RX_CHARACTERISTIC);
     public final static UUID CLIENT_UUID = UUID.fromString(SampleGattAttributes.CLIENT_CHARACTERISTIC_CONFIG);
+
+    private Handler dataTimeoutWacthdog = new Handler();
+
+    public Handler getDataTimeoutWatchdog()
+    {
+        return dataTimeoutWacthdog;
+    }
 
     // Implements callback methods for GATT events that the app cares about.  For example,
     // connection change and services discovered.

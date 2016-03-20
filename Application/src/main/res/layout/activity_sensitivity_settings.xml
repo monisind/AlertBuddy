@@ -1,0 +1,55 @@
+<!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"-->
+    <!--android:paddingRight="@dimen/activity_horizontal_margin"-->
+    <!--android:paddingTop="@dimen/activity_vertical_margin"-->
+    <!--android:paddingBottom="@dimen/activity_vertical_margin"-->
+    <!--tools:context="com.example.android.alertbuddy.BLESettingsActivity">-->
+    <!--<TextView android:layout_width="fill_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:padding="2dp"-->
+        <!--android:text="@string/sound_settings_sub_header"-->
+        <!--android:textSize="20sp" />-->
+
+<!--</RelativeLayout>-->
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical"
+tools:context="com.example.android.alertbuddy.BLESettingsActivity">
+    <TextView android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="2dp"
+        android:background="@color/red"
+        android:textColor="@color/white"
+        android:text="@string/action_settings_sensitivity"
+        android:textSize="20sp" />
+    <RadioGroup  android:id="@+id/sensitivity_radiogroup" xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <RadioButton android:id="@+id/sensitivity_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Very fast detection"
+            android:onClick="onRadioButtonClicked"/>
+        <RadioButton android:id="@+id/sensitivity_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fast detection"
+            android:onClick="onRadioButtonClicked"/>
+        <RadioButton android:id="@+id/sensitivity_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Normal"
+            android:onClick="onRadioButtonClicked"/>
+        <RadioButton android:id="@+id/sensitivity_4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Slow detection"
+            android:onClick="onRadioButtonClicked"/>
+    </RadioGroup>
+</LinearLayout>

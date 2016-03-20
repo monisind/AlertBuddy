@@ -10,5 +10,9 @@
         android:title="@string/action_settings_ble"
         android:orderInCategory="100"
         android:showAsAction="never" />
+    <item android:id="@+id/action_settings_sensitivity"
+        android:title="@string/action_settings_sensitivity"
+        android:orderInCategory="100"
+        android:showAsAction="never" />
 </menu>
 
