@@ -74,6 +74,9 @@
             android:name=".SoundSettingsActivity"
             android:label="@string/title_activity_sound_settings" />
         <activity
+            android:name=".SensitivitySettingsActivity"
+            android:label="Sensitivity Settings" />
+        <activity
             android:name=".BLESettingsActivity"
             android:label="@string/title_activity_blesettings" >
         </activity>

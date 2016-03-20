@@ -253,8 +253,7 @@ public class DisplaySoundActivity extends Activity {
     private int lastDetected = 0;
     private void displayDetectedSound(int classificationResult )
     {
-        Log.d(TAG, "Senstivity: " + sensitivity)
-;        SharedPreferences sensitivitySharedPref = getSharedPreferences("SensitivitySettings", 0);
+        SharedPreferences sensitivitySharedPref = getSharedPreferences("SensitivitySettings", 0);
 
         if(sensitivitySharedPref.contains(SensitivitySettingsActivity.SENSITIVITY_SETTING_STRING))
         {
@@ -417,12 +416,17 @@ public class DisplaySoundActivity extends Activity {
             case R.id.action_settings_sound:
                 Log.i(TAG, "Menu item: " + item.getTitle());
                 Intent sound_intent = new Intent(this, SoundSettingsActivity.class);
-                startActivityForResult(sound_intent,REQUEST_CODE );
+                startActivityForResult(sound_intent, REQUEST_CODE);
                 return true;
             case R.id.action_settings_ble:
                 Log.i(TAG, "Menu item: " + item.getTitle());
                 Intent ble_intent = new Intent(this, BLESettingsActivity.class);
                 startActivity(ble_intent);
+                return true;
+            case R.id.action_settings_sensitivity:
+                Log.i(TAG, "Menu item: " + item.getTitle());
+                Intent sensitivity_intent = new Intent(this, SensitivitySettingsActivity.class);
+                startActivity(sensitivity_intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
