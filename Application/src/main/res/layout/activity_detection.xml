@@ -38,7 +38,9 @@
         android:layout_marginTop="13dp"
         android:layout_below="@+id/textView2"
         android:layout_alignParentStart="true"
-        android:layout_toStartOf="@+id/radioGroup" />
+        android:layout_toStartOf="@+id/textViewResult"
+        android:layout_above="@+id/textViewResult"
+        android:maxWidth="@dimen/margin_medium" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -74,66 +76,31 @@
         android:text="Training"
         android:id="@+id/checkBoxTrain"
         android:checked="false"
-        android:layout_alignParentTop="true"
-        android:layout_alignStart="@+id/radioGroup" />
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="22dp" />
 
-    <CheckBox
+    <Spinner
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="IsSiren"
-        android:id="@+id/checkBoxIsSiren"
-        android:checked="false"
+        android:id="@+id/spinner"
+        android:layout_below="@+id/btnAddSound"
+        android:layout_toEndOf="@+id/textViewResult" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/editText"
         android:layout_below="@+id/checkBoxTrain"
-        android:layout_alignStart="@+id/checkBoxTrain" />
+        android:layout_alignStart="@+id/textViewResult"
+        android:layout_alignEnd="@+id/checkBoxTrain" />
 
-    <RadioGroup
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/radioGroup"
-        android:layout_below="@+id/textView2"
-        android:layout_toEndOf="@+id/textViewResult"
-        android:visibility="invisible">
-
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Police Siren"
-            android:id="@+id/radio_police_siren"
-            android:checked="false"
-            android:nestedScrollingEnabled="false"
-            android:onClick="onRadioButtonClicked" />
-
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Fire Alarm"
-            android:id="@+id/radio_fire_alarm"
-            android:checked="false"
-            android:onClick="onRadioButtonClicked" />
-
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Ambulance Siren"
-            android:id="@+id/radio_ambulance"
-            android:checked="false"
-            android:onClick="onRadioButtonClicked" />
-
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Car Horn"
-            android:id="@+id/radio_car_horn"
-            android:checked="false"
-            android:onClick="onRadioButtonClicked" />
-
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tornado Siren"
-            android:id="@+id/radio_tornado_siren"
-            android:checked="false"
-            android:onClick="onRadioButtonClicked" />
-    </RadioGroup>
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Sound"
+        android:id="@+id/btnAddSound"
+        android:layout_below="@+id/buttonScan"
+        android:layout_alignEnd="@+id/editText" />
 
 </RelativeLayout>

@@ -34,12 +34,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.CancellationSignal;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -47,13 +49,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SimpleExpandableListAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -72,7 +78,7 @@ import java.util.UUID;
 /**
  * Activity for scanning and displaying available Bluetooth LE devices.
  */
-public class DetectionActivity extends Activity {
+public class DetectionActivity extends Activity implements AdapterView.OnItemSelectedListener {
     private final static String TAG = DetectionActivity.class.getSimpleName();
 
     private BluetoothAdapter mBluetoothAdapter;
@@ -96,17 +102,48 @@ public class DetectionActivity extends Activity {
     private static List<ScanFilter> scanFilters = new ArrayList<ScanFilter>();
     private static final ScanSettings mScanSettings = new ScanSettings.Builder().build();
 
+    private SharedPreferences sound_prefs;
+
+    private EditText meditText;
+
     private TextView mtxtViewRawData ;
     private TextView mtxtViewScanning ;
     private TextView mtxtViewResult ;
     private Button mbtnScan ;
 
+    private Button mbtnAddSound;
+
     private RadioGroup mRadioGroup;
 
     private CheckBox mchkBoxTraining;
-    private CheckBox mchkBoxIsSiren;
 
-    private ButtonListener mbtnListener;
+    Spinner spinner;
+
+    ArrayAdapter<String> spinnerAdapter;
+    // Create an ArrayAdapter using the string array and a default spinner layout
+//    ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+//            R.array.planets_array, android.R.layout.simple_spinner_item);
+//// Specify the layout to use when the list of choices appears
+//    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//// Apply the adapter to the spinner
+//    spinner.setAdapter(adapter);
+
+
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//            Object obj = parent.getItemAtPosition(position);
+//            SharedPreferences prefs = getSharedPreferences("sounds", MODE_PRIVATE);
+//            SharedPreferences.Editor prefsEditor = prefs.edit();
+//            prefsEditor.putString("object", obj.toString());
+//            prefsEditor.commit();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
+
     private View.OnClickListener mchkBoxListener;
 
 
@@ -191,25 +228,60 @@ public class DetectionActivity extends Activity {
 
         mtxtViewScanning = (TextView) findViewById(R.id.textViewScanning);
         mtxtViewResult = (TextView) findViewById(R.id.textViewResult);
+
+        meditText = (EditText) findViewById(R.id.editText);
+
         mbtnScan = (Button) findViewById(R.id.buttonScan);
+        mbtnAddSound = (Button) findViewById(R.id.btnAddSound);
 
-        mbtnListener = new ButtonListener();
-        mbtnScan.setOnClickListener(mbtnListener);
+        mbtnScan.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                scanLeDevice();
+            }
+        });
 
-        mRadioGroup = (RadioGroup) findViewById(R.id.radioGroup);
+        mbtnAddSound.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+
+                String soundName = meditText.getText().toString();
+                sound_prefs = getSharedPreferences("sounds", MODE_PRIVATE);
+                if(!soundName.isEmpty() && !sound_prefs.contains(soundName)) {
+                    SharedPreferences.Editor prefsEditor = sound_prefs.edit();
+                    prefsEditor.putString(soundName, soundName);
+                    prefsEditor.commit();
+                    spinnerAdapter.add(soundName);
+                    spinnerAdapter.notifyDataSetChanged();
+                }
+            }
+        });
+
+       // mRadioGroup = (RadioGroup) findViewById(R.id.radioGroup);
 
         mchkBoxTraining = (CheckBox) findViewById(R.id.checkBoxTrain);
-        mchkBoxIsSiren = (CheckBox) findViewById(R.id.checkBoxIsSiren);
+
+
+
+        spinner = (Spinner) findViewById(R.id.spinner);
+        spinnerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(spinnerAdapter);
+        spinner.setOnItemSelectedListener(this);
+
+        sound_prefs = getSharedPreferences("sounds", MODE_PRIVATE);
+        for(String i: sound_prefs.getAll().keySet())
+        {
+            spinnerAdapter.add(i);
+        }
+        spinnerAdapter.notifyDataSetChanged();
+
+
 
         mchkBoxListener = new View.OnClickListener() {
             public void onClick(View v) {
-                if(mchkBoxTraining.isChecked() && mchkBoxIsSiren.isChecked())
-                {
+                if(mchkBoxTraining.isChecked()) {
                     updateView(ViewContext.TRAINING_SIREN);
-                }
-                else if(mchkBoxTraining.isChecked())
-                {
-                    updateView(ViewContext.TRAINING_NO_SIREN);
                 }
                 else
                 {
@@ -219,7 +291,6 @@ public class DetectionActivity extends Activity {
         };
 
         mchkBoxTraining.setOnClickListener(mchkBoxListener);
-        mchkBoxIsSiren.setOnClickListener(mchkBoxListener);
 
         Intent detectionServiceIntent = new Intent(this, DetectionService.class);
         bindService(detectionServiceIntent, mDetectionServiceConnection, BIND_AUTO_CREATE);
@@ -405,35 +476,34 @@ public class DetectionActivity extends Activity {
 
     private void saveMFCCs(float[] mfcccs)
     {
-        Log.d(TAG, "Writing to file: " + getExternalFilesDir(null));
-
-        File file = new File(getExternalFilesDir(null), "mfccs.txt");
-
         if(mchkBoxTraining.isChecked())
         {
-            file = new File(getExternalFilesDir(null), "no_siren_mfccs.txt");
-            if(mchkBoxIsSiren.isChecked())
+            Log.d(TAG, "Writing to file: " + getExternalFilesDir(null));
+
+            String fileName = spinner.getSelectedItem().toString()+".txt";
+
+            Log.d(TAG, "File name: " +fileName);
+            File file = new File(getExternalFilesDir(null), fileName);
+
+            if(isExternalStorageWritable()) {
+                try {
+
+                    FileOutputStream fOut = new FileOutputStream(file, true);
+                    OutputStreamWriter osw = new OutputStreamWriter(fOut);
+                    osw.write(convertToCommaDelimited(mfcccs));
+                    osw.write("\n");
+                    osw.flush();
+                    osw.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            else
             {
-                file = new File(getExternalFilesDir(null), mfccSaveFileName +".txt");
+                Log.d(TAG, "Unable to write file, external storage not writable");
             }
-        }
 
-        if(isExternalStorageWritable()) {
-            try {
 
-                FileOutputStream fOut = new FileOutputStream(file, true);
-                OutputStreamWriter osw = new OutputStreamWriter(fOut);
-                osw.write(convertToCommaDelimited(mfcccs));
-                osw.write("\n");
-                osw.flush();
-                osw.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        else
-        {
-            Log.d(TAG, "Unable to write file, external storage not writable");
         }
     }
 
@@ -602,13 +672,13 @@ public class DetectionActivity extends Activity {
                 mtxtViewResult.setText("NONE");
                 break;
             case TRAINING_SIREN:
-                mRadioGroup.setVisibility(View.VISIBLE);
+                //mRadioGroup.setVisibility(View.VISIBLE);
                 break;
             case TRAINING_NO_SIREN:
-                mRadioGroup.setVisibility(View.INVISIBLE);
+                //mRadioGroup.setVisibility(View.INVISIBLE);
                 break;
             case NO_TRAINING:
-                mRadioGroup.setVisibility(View.INVISIBLE);
+                //mRadioGroup.setVisibility(View.INVISIBLE);
 
         }
 
@@ -620,18 +690,6 @@ public class DetectionActivity extends Activity {
         String name = ((RadioButton) view).getText().toString();
         if (checked) {
             mfccSaveFileName = name;
-        }
-    }
-
-    private class ButtonListener implements View.OnClickListener
-    {
-
-        @Override
-        public void onClick(View v) {
-            if(v.equals(mbtnScan))
-            {
-                scanLeDevice();
-            }
         }
     }
 
