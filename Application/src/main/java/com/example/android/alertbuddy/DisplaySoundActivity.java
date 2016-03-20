@@ -2,6 +2,7 @@
 package com.example.android.alertbuddy;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
@@ -133,6 +134,7 @@ public class DisplaySoundActivity extends Activity {
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
             mBluetoothLeService = null;
+
         }
     };
 
@@ -153,7 +155,11 @@ public class DisplaySoundActivity extends Activity {
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 mConnected = false;
                 updateConnectionState(R.string.disconnected);
+                Intent scan_intent = new Intent(DisplaySoundActivity.this, DeviceScanActivity.class);
+                startActivity(scan_intent);
                 invalidateOptionsMenu();
+                unregisterReceiver(mGattUpdateReceiver);
+                finish();
 
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 // Show all the supported services and characteristics on the user interface.
@@ -363,6 +369,9 @@ public class DisplaySoundActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        Intent intent = getIntent();
+        mDeviceName = intent.getStringExtra(EXTRAS_DEVICE_NAME);
+        mDeviceAddress = intent.getStringExtra(EXTRAS_DEVICE_ADDRESS);
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
         if (mBluetoothLeService != null) {
             final boolean result = mBluetoothLeService.connect(mDeviceAddress);
@@ -449,6 +458,15 @@ public class DisplaySoundActivity extends Activity {
 
 
     private void updateConnectionState(final int resourceId) {
+        if(BluetoothLeService.mBluetoothGatt != null) {
+            BluetoothDevice device = BluetoothLeService.mBluetoothGatt.getDevice();
+            if(device != null) {
+                SharedPreferences sharedPref = getSharedPreferences("device", 0);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putString(getString(R.string.last_connected_device), device.getAddress());
+                editor.commit();
+            }
+        }
         runOnUiThread(new Runnable() {
             @Override
             public void run() {

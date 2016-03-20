@@ -308,14 +308,14 @@ public class DeviceScanActivity extends ListActivity {
     }
 
     public void storeDevice(BluetoothDevice device){
-        SharedPreferences sharedPref = DeviceScanActivity.this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = getSharedPreferences("device", 0);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(getString(R.string.last_connected_device), device.getAddress());
         editor.commit();
     }
 
     public String readStoredDevice(){
-        SharedPreferences sharedPref = DeviceScanActivity.this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = getSharedPreferences("device", 0);
         String deviceAddress = sharedPref.getString(getString(R.string.last_connected_device), "null");
         return deviceAddress;
     }

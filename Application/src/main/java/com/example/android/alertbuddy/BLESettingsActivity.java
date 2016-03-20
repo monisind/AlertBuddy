@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ListActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
@@ -11,6 +12,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,12 +31,14 @@ import java.util.List;
 
 public class BLESettingsActivity extends Activity {
     private BluetoothAdapter mBluetoothAdapter;
+
     private final static String TAG = BLESettingsActivity.class.getSimpleName();
     private Handler mHandler;
     private boolean mScanning;
     private LeDeviceListAdapter mLeDeviceListAdapter;
     private static final int REQUEST_ENABLE_BT = 1;
     private ListView listView;
+    private BluetoothGatt mBluetoothGatt;
 
     // Stops scanning after 20 seconds.
     private static final long SCAN_PERIOD = 5000;
@@ -43,6 +47,8 @@ public class BLESettingsActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ble_settings);
+
+        mBluetoothGatt = BluetoothLeService.mBluetoothGatt;
         mHandler = new Handler();
 
         // Initializes a Bluetooth adapter.  For API level 18 and above, get a reference to
@@ -109,6 +115,10 @@ public class BLESettingsActivity extends Activity {
             }
         }
 
+        final BluetoothManager bluetoothManager =
+                (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        displayConnectedDevice(bluetoothManager);
+
         // Initializes list view adapter.
         mLeDeviceListAdapter = new LeDeviceListAdapter();
 //        setListAdapter(mLeDeviceListAdapter);
@@ -120,7 +130,9 @@ public class BLESettingsActivity extends Activity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 final BluetoothDevice device = mLeDeviceListAdapter.getDevice(position);
+                Log.d(TAG, "list item clicked");
                 if (device == null) return;
+                Log.d(TAG, "Selecting Device: " + device.getAddress());
                 selectDevice(device);
             }
         });
@@ -194,6 +206,9 @@ public class BLESettingsActivity extends Activity {
 //    }
 
     private void selectDevice(BluetoothDevice device){
+        //disconnect current device
+        disconnect();
+
         final Intent intent = new Intent(this, DisplaySoundActivity.class);
         intent.putExtra(DisplaySoundActivity.EXTRAS_DEVICE_NAME, device.getName());
         intent.putExtra(DisplaySoundActivity.EXTRAS_DEVICE_ADDRESS, device.getAddress());
@@ -203,7 +218,22 @@ public class BLESettingsActivity extends Activity {
         }
         storeDevice(device);
         startActivity(intent);
-        //finish();
+        finish();
+    }
+
+
+    public void disconnect() {
+        if (mBluetoothAdapter == null || mBluetoothGatt == null) {
+            Log.w(TAG, "BluetoothAdapter not initialized");
+            return;
+        }
+        BluetoothDevice device =  mBluetoothGatt.getDevice();
+        if(device != null) {
+            Log.d(TAG, "disconnecting from " + device.getAddress());
+        }else{
+            Log.d(TAG, "no device was connected " );
+        }
+        mBluetoothGatt.disconnect();
     }
 
 
@@ -292,7 +322,7 @@ public class BLESettingsActivity extends Activity {
     }
 
     public void storeDevice(BluetoothDevice device){
-        SharedPreferences sharedPref = BLESettingsActivity.this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = getSharedPreferences("device", 0);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(getString(R.string.last_connected_device), device.getAddress());
         editor.commit();
