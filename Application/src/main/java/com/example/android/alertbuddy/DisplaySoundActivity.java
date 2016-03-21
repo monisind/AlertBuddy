@@ -247,11 +247,60 @@ public class DisplaySoundActivity extends Activity {
     }
 
 
-    private int confidence = 0;
-    private int lastDetected = 0;
+    private int clearSensitivity = 3; //How quickly can we clear a siren?
+    private int clearResult = 1; // The result that is not a siren
+    private int clearingConfidence = 0;
+
+    private int detectionConfidence = 0;
     private int previousNotification = 0;
+
     private void displayDetectedSound(int classificationResult )
     {
+
+        if(classificationResult == clearResult)
+        {
+            clearingConfidence++;
+            if(clearingConfidence >= clearSensitivity)
+            {
+                rx_msg.setText(DEFAULT_TEXT);
+                if(previousNotification != classificationResult) {
+                    sendAlarmNotificationToPeripheral(classificationResult); //TODO: Update this it is a hack
+                    previousNotification = classificationResult;
+                }
+            }
+        }
+        else
+        {
+            clearingConfidence = 0; // Reset the clearing confidence
+            detectionConfidence ++;
+            SharedPreferences sensitivitySharedPref = getSharedPreferences("SensitivitySettings", 0);
+
+            int sensitivity = SensitivitySettingsActivity.DEFAULT_SENSITIVITY;
+            if(sensitivitySharedPref.contains(SensitivitySettingsActivity.SENSITIVITY_SETTING_STRING))
+            {
+                sensitivity = sensitivitySharedPref.getInt(SensitivitySettingsActivity.SENSITIVITY_SETTING_STRING,
+                        SensitivitySettingsActivity.DEFAULT_SENSITIVITY);
+            }
+
+            if(detectionConfidence >= sensitivity) {
+                SharedPreferences sharedPref = getSharedPreferences("SoundSettings", 0);
+                Map<String, ?> allEntries = sharedPref.getAll();
+
+                String sound = SoundModel.getSoundForCode(classificationResult);
+
+                if ((Boolean) allEntries.get(sound)) {
+                    rx_msg.setText("Detected " + sound);
+                    mBluetoothLeService.updateNotification("Detected " + sound);
+                    if (previousNotification != classificationResult) {
+                        sendAlarmNotificationToPeripheral(classificationResult); //TODO: Update this it is a hack
+                        previousNotification = classificationResult;
+                    }
+
+                }
+            }
+        }
+
+        /*
         SharedPreferences sensitivitySharedPref = getSharedPreferences("SensitivitySettings", 0);
 
         if(sensitivitySharedPref.contains(SensitivitySettingsActivity.SENSITIVITY_SETTING_STRING))
@@ -304,7 +353,7 @@ public class DisplaySoundActivity extends Activity {
                 }
             }
         }
-        lastDetected = classificationResult;
+        lastDetected = classificationResult; */
     }
 
     private boolean sendData(byte[] data)
