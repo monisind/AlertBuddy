@@ -150,7 +150,7 @@ public class DisplaySoundActivity extends Activity {
                 Intent scan_intent = new Intent(DisplaySoundActivity.this, DeviceScanActivity.class);
                 startActivity(scan_intent);
                 invalidateOptionsMenu();
-                unregisterReceiver(mGattUpdateReceiver);
+                //unregisterReceiver(mGattUpdateReceiver);
                 finish();
 
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
@@ -247,7 +247,7 @@ public class DisplaySoundActivity extends Activity {
     }
 
 
-    private int clearSensitivity = 3; //How quickly can we clear a siren?
+    private int clearSensitivity = 5; //How quickly can we clear a siren?
     private int clearResult = 1; // The result that is not a siren
     private int clearingConfidence = 0;
 
