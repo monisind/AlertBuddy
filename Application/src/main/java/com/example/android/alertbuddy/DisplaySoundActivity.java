@@ -293,13 +293,13 @@ public class DisplaySoundActivity extends Activity {
                 rx_msg.setText("Detected " + sound);
                 mBluetoothLeService.updateNotification("Detected " + sound);
                 if(previousNotification != classificationResult) {
-                    sendAlarmNotificationToPeripheral(classificationResult - 1); //TODO: Update this it is a hack
+                    sendAlarmNotificationToPeripheral(classificationResult); //TODO: Update this it is a hack
                     previousNotification = classificationResult;
                 }
             } else {
                 rx_msg.setText(DEFAULT_TEXT);
                 if(previousNotification != classificationResult) {
-                    sendAlarmNotificationToPeripheral(0); //TODO: Update this it is a hack
+                    sendAlarmNotificationToPeripheral(classificationResult); //TODO: Update this it is a hack
                     previousNotification = classificationResult;
                 }
             }
