@@ -3,7 +3,6 @@ package com.example.android.alertbuddy;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -15,14 +14,9 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,11 +24,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DisplaySoundActivity extends Activity {
 
@@ -251,6 +243,7 @@ public class DisplaySoundActivity extends Activity {
 
     private int confidence = 0;
     private int lastDetected = 0;
+    private int previousNotification = 0;
     private void displayDetectedSound(int classificationResult )
     {
         SharedPreferences sensitivitySharedPref = getSharedPreferences("SensitivitySettings", 0);
@@ -293,9 +286,16 @@ public class DisplaySoundActivity extends Activity {
             if (!sound.equals("Other") && (Boolean) allEntries.get(sound)) {
                 rx_msg.setText("Detected " + sound);
                 mBluetoothLeService.updateNotification("Detected " + sound);
-                sendNotificationToPeripheral(sound);
+                if(previousNotification != classificationResult) {
+                    sendAlarmNotificationToPeripheral(classificationResult - 1); //TODO: Update this it is a hack
+                    previousNotification = classificationResult;
+                }
             } else {
                 rx_msg.setText(DEFAULT_TEXT);
+                if(previousNotification != classificationResult) {
+                    sendAlarmNotificationToPeripheral(0); //TODO: Update this it is a hack
+                    previousNotification = classificationResult;
+                }
             }
         }
         lastDetected = classificationResult;
@@ -497,23 +497,23 @@ public class DisplaySoundActivity extends Activity {
 //
 //    }
 
-    public void sendNotificationToPeripheral(String soundDetected){
+    public void sendAlarmNotificationToPeripheral(int soundId){
         if (target_character != null) {
-            if (soundDetected != null) {
-                byte[] tmp = soundDetected.getBytes();
-                byte[] tx = new byte[tmp.length];
-                for (int i = 0; i < tmp.length; i++) {
-                    tx[i] = tmp[i];
-                }
-                target_character.setValue(tx);
-                mBluetoothLeService.writeCharacteristic(target_character);
+
+            byte[] alarm_notification = {(byte)'A',(byte)'L',(byte)'A', (byte)'R',(byte)'M', (byte)soundId};
+            boolean result = sendData(alarm_notification);
+            if(result)
+            {
+                Log.d(TAG, "Sent Alarm Notification " + soundId);
+            }
+            else
+            {
+                Log.d(TAG, "Failed to send Alarm Notification");
+            }
 
 
             }
-        } else {
-            Toast.makeText(DisplaySoundActivity.this, "Please select a UUID.", Toast.LENGTH_SHORT).show();
-        }
-    }
+         }
 }
 
 
