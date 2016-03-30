@@ -188,10 +188,10 @@ public class BLESettingsActivity extends Activity {
                         public void run() {
                             // check connection state of the device
                             String scannedDeviceName  = device.getName();
-//                            if(scannedDeviceName!=null && scannedDeviceName.equals(FILTER_DEVICE_NAME)){
+                            if(scannedDeviceName!=null && scannedDeviceName.equals(DeviceScanActivity.FILTER_DEVICE_NAME)){
                                 mLeDeviceListAdapter.addDevice(device);
                                 mLeDeviceListAdapter.notifyDataSetChanged();
-//                            }
+                            }
                         }
                     });
                 }
