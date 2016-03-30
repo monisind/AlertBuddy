@@ -82,7 +82,23 @@ public class DisplaySoundActivity extends Activity {
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
 
+        loadSounds();
+
     }
+
+    public void loadSounds(){
+        SharedPreferences sharedPref = getSharedPreferences("SoundSettings", 0);
+        Map<String, ?> allEntries = sharedPref.getAll();
+        if(allEntries.size() == 0){
+            SharedPreferences.Editor editor = sharedPref.edit();
+
+            for ( Map.Entry<Integer, String> entry : SoundModel.soundTypes.entrySet()) {
+                editor.putBoolean(entry.getValue(), true);
+            }
+            editor.commit();
+        }
+    }
+
     private void getCharacteristics(List<BluetoothGattService> gattServices) {
         Boolean tx = false;
         Boolean rx = false;
@@ -293,7 +309,7 @@ public class DisplaySoundActivity extends Activity {
         float classificationResult = detection.classify(mfccs);
         Log.d(TAG, "CLASSIFICATION " + classificationResult);
 
-        displayDetectedSound((int)classificationResult);
+        displayDetectedSound((int) classificationResult);
 
         saveMFCCs(mfccs);
     }
