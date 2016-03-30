@@ -13,6 +13,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
@@ -21,6 +22,9 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -165,6 +169,54 @@ public class DisplaySoundActivity extends Activity {
     };
 
 
+    /* Checks if external storage is available for read and write */
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+
+    public static String convertToCommaDelimited(float[] list) {
+        StringBuffer ret = new StringBuffer("");
+        for (int i = 0; list != null && i < list.length; i++) {
+            ret.append(list[i]);
+            if (i < list.length - 1) {
+                ret.append(',');
+            }
+        }
+        return ret.toString();
+    }
+
+    private void saveMFCCs(float[] mfcccs)
+    {
+
+
+
+            Log.d(TAG, "File name: " +"mfcc.txt");
+            File file = new File(getExternalFilesDir(null), "mfcc.txt");
+
+            if(isExternalStorageWritable()) {
+                try {
+
+                    FileOutputStream fOut = new FileOutputStream(file, true);
+                    OutputStreamWriter osw = new OutputStreamWriter(fOut);
+                    osw.write(convertToCommaDelimited(mfcccs));
+                    osw.write("\n");
+                    osw.flush();
+                    osw.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            else
+            {
+                Log.d(TAG, "Unable to write file, external storage not writable");
+            }
+    }
+
     private ArrayList<Float> dataValues = new ArrayList<Float>();
     private static int DATA_WATCHDOG_PERIOD = 5000;
     private int receivedMfccDataCount = 0;
@@ -243,7 +295,7 @@ public class DisplaySoundActivity extends Activity {
 
         displayDetectedSound((int)classificationResult);
 
-        //saveMFCCs(mfccs);
+        saveMFCCs(mfccs);
     }
 
 
